@@ -55,6 +55,7 @@
     "geeker",
     "Gitee",
     "hexs",
+    "huaYu",
     "iconfont",
     "juejin",
     "liquidfill",
@@ -93,7 +94,5 @@
     "zhongyingwen",
     "zhuti"
   ],
-  "i18n-ally.localesPaths": [
-    "src/languages"
-  ]
+  "i18n-ally.localesPaths": ["src/languages"]
 }

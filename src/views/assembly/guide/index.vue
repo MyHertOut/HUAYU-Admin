@@ -6,7 +6,7 @@
       type="warning"
       :closable="false"
     />
-    <div id="Geeker">
+    <div id="HuaYu">
       <el-button type="primary" @click.prevent.stop="driverObj.drive()"> 打开引导页 🤹‍♂️ </el-button>
     </div>
   </div>
