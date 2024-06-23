@@ -28,7 +28,21 @@ export interface GlobalState {
 /* UserState */
 export interface UserState {
   token: string;
-  userInfo: { name: string };
+  userInfo: {
+    id: any;
+    username: string;
+    loginame: string;
+    password: string;
+    position: string;
+    department: string;
+    email: string;
+    phonenum: string;
+    usertype: string;
+    userstatus: any;
+    description: string;
+    remark: string;
+    tenantId: any;
+  };
 }
 
 /* tabsMenuProps */

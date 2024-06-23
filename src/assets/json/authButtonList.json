@@ -2,7 +2,11 @@
   "code": 200,
   "data": {
     "useProTable": ["add", "batchAdd", "export", "batchDelete", "status"],
-    "projectMan": ["add", "batchAdd", "export", "batchDelete", "status"],
+    "projectManage": ["add", "batchAdd", "export", "batchDelete", "status"],
+    "warehouseManage": ["add", "batchAdd", "export", "batchDelete", "status"],
+    "accountManage": ["add", "batchAdd", "export", "batchDelete", "status"],
+    "boxTypeManage": ["add", "batchAdd", "export", "batchDelete", "status"],
+    "roleManage": ["add", "batchAdd", "export", "batchDelete", "status"],
     "authButton": ["add", "edit", "delete", "import", "export"]
   },
   "msg": "成功"

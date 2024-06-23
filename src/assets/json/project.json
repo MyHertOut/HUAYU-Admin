@@ -1,0 +1,24 @@
+{
+  "code": 200,
+  "data": {
+    "rows": [
+      {
+        "id": 1,
+        "materialProject": "F1",
+        "materialName": "玻纤毡04（玻纤纤维PET封装）",
+        "partNo": "500109-00257-34",
+        "produceDate": "6/23/2024",
+        "batchNo": "240617",
+        "materialNum": 40,
+        "shift": "A",
+        "checker": "叶维政",
+        "checkDate": "6/23/2024",
+        "createTime": "6/23/2024"
+      }
+    ],
+    "totalRows": 1,
+    "pageNo": 1,
+    "pageSize": 10
+  },
+  "msg": "成功"
+}

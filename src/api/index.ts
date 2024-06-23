@@ -46,7 +46,7 @@ class RequestHttp {
         config.loading ??= true;
         config.loading && showFullScreenLoading();
         if (config.headers && typeof config.headers.set === "function") {
-          config.headers.set("x-access-token", userStore.token);
+          config.headers.set("authorization", userStore.token);
         }
         return config;
       },
@@ -110,6 +110,9 @@ class RequestHttp {
   }
   delete<T>(url: string, params?: any, _object = {}): Promise<ResultData<T>> {
     return this.service.delete(url, { params, ..._object });
+  }
+  deleteBody<T>(url: string, params?: any): Promise<ResultData<T>> {
+    return this.service.delete(url, { data: params });
   }
   download(url: string, params?: object, _object = {}): Promise<BlobPart> {
     return this.service.post(url, params, { ..._object, responseType: "blob" });

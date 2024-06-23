@@ -27,7 +27,7 @@ import Avatar from "./components/Avatar.vue";
 import SwitchDark from "@/components/SwitchDark/index.vue";
 
 const userStore = useUserStore();
-const username = computed(() => userStore.userInfo.name);
+const username = computed(() => userStore.userInfo.username);
 </script>
 
 <style scoped lang="scss">

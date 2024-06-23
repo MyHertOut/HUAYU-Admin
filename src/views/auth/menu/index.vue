@@ -21,6 +21,7 @@ const userStore = useUserStore();
 
 const handleToLogin = () => {
   userStore.setToken("");
+  userStore.setUserInfo({ name: "" });
   router.push(LOGIN_URL);
 };
 </script>

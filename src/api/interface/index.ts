@@ -12,14 +12,14 @@ export interface ResultData<T = any> extends Result {
 // 分页响应参数
 export interface ResPage<T> {
   list: T[];
-  pageNum: number;
+  pageNo: number;
   pageSize: number;
   total: number;
 }
 
 // 分页请求参数
 export interface ReqPage {
-  pageNum: number;
+  pageNo: number;
   pageSize: number;
 }
 
@@ -37,7 +37,8 @@ export namespace Login {
     password: string;
   }
   export interface ResLogin {
-    access_token: string;
+    token: string;
+    userInfo: any;
   }
   export interface ResAuthButtons {
     [key: string]: string[];
@@ -58,16 +59,13 @@ export namespace User {
   export interface ResUserList {
     id: string;
     username: string;
-    gender: number;
-    user: { detail: { age: number } };
-    idCard: string;
-    email: string;
-    address: string;
-    createTime: string;
+    userHeaderIcon: string;
+    phone: string;
+    department: string;
+    position: string;
+    userType: string;
     status: number;
-    avatar: string;
-    photo: any[];
-    children?: ResUserList[];
+    createTime: string;
   }
   export interface ResStatus {
     userLabel: string;
@@ -86,5 +84,62 @@ export namespace User {
     id: string;
     name: string;
     children?: ResDepartment[];
+  }
+}
+
+// 产品管理模块
+export namespace Project {
+  export interface ReqProjectParams extends ReqPage {}
+  export interface ResProjectList {
+    id: number;
+    materialProject: string; // 项目名册
+    materialName: string; // 零件名称
+    partNo: string; // 件号
+    produceDate: string; // 生产日期
+    batchNo: string; // 批次
+    materialNum: number; // 数量
+    shift: string; // 班次
+    checker: string; // 检验员名称
+    checkDate: string; // 检验日期
+    categoryName: string;
+    weight: string;
+    categoryId: number; // 物品类型ID
+    storage: number;
+    createTime: string;
+    updateTime: string;
+    remark: string;
+    deleteFlag: number;
+  }
+}
+
+// 仓库管理模块
+export namespace Depot {
+  export interface ReqDepotParams extends ReqPage {}
+  export interface ResDepotList {
+    id: number;
+    depotName: string;
+    depotNo: string;
+    depotTypeName: string;
+    depotAddress: string;
+    depotArea: string;
+    depotOwner: string;
+    remark: string;
+    createTime: string;
+    updateTime: string;
+    deleteFlag: number;
+  }
+}
+
+// 角色模块
+export namespace Role {
+  export interface ReqRoleParams extends ReqPage {}
+  export interface ResRoleList {
+    id: number;
+    roleName: string;
+    roleStatus: number;
+    menuIds: any;
+    createTime: string;
+    updateTime: string;
+    deleteFlag: number;
   }
 }

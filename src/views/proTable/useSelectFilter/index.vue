@@ -115,7 +115,7 @@ const getUserRoleDict = async () => {
 const selectFilterValues = ref({ userStatus: "2", userRole: ["1", "3"] });
 const changeSelectFilter = (value: typeof selectFilterValues.value) => {
   ElMessage.success("请注意查看请求参数变化 🤔");
-  proTable.value!.pageable.pageNum = 1;
+  proTable.value!.pageable.pageNo = 1;
   selectFilterValues.value = value;
 };
 
@@ -123,7 +123,7 @@ const changeSelectFilter = (value: typeof selectFilterValues.value) => {
 const treeFilterValues = reactive({ departmentId: ["11"] });
 const changeTreeFilter = (val: string[]) => {
   ElMessage.success("请注意查看请求参数变化 🤔");
-  proTable.value!.pageable.pageNum = 1;
+  proTable.value!.pageable.pageNo = 1;
   treeFilterValues.departmentId = val;
 };
 
