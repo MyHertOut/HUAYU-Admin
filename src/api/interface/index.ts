@@ -54,7 +54,7 @@ export namespace User {
     email: string;
     address: string;
     createTime: string[];
-    status: number;
+    userstatus: number;
   }
   export interface ResUserList {
     id: string;
@@ -64,7 +64,7 @@ export namespace User {
     department: string;
     position: string;
     userType: string;
-    status: number;
+    userstatus: number;
     createTime: string;
   }
   export interface ResStatus {
@@ -140,6 +140,31 @@ export namespace Role {
     menuIds: any;
     createTime: string;
     updateTime: string;
+    deleteFlag: number;
+  }
+}
+
+// 箱型管理模块
+export namespace ProjectCategory {
+  export interface ReqProjectCategoryParams extends ReqPage {}
+  export interface ResProjectCategoryList {
+    id: number;
+    materialProject: string; // 项目名册
+    materialName: string; // 零件名称
+    partNo: string; // 件号
+    produceDate: string; // 生产日期
+    batchNo: string; // 批次
+    materialNum: number; // 数量
+    shift: string; // 班次
+    checker: string; // 检验员名称
+    checkDate: string; // 检验日期
+    categoryName: string;
+    weight: string;
+    categoryId: number; // 物品类型ID
+    storage: number;
+    createTime: string;
+    updateTime: string;
+    remark: string;
     deleteFlag: number;
   }
 }

@@ -9,11 +9,11 @@
       @darg-sort="sortTable"
     >
       <!-- 表格 header 按钮 -->
-      <template #tableHeader="scope">
+      <template #tableHeader="">
         <el-button v-auth="'add'" type="primary" :icon="CirclePlus" @click="openDrawer('新增')">新增角色</el-button>
-        <el-button type="danger" :icon="Delete" plain :disabled="!scope.isSelected" @click="batchDelete(scope.selectedListIds)">
+        <!-- <el-button type="danger" :icon="Delete" plain :disabled="!scope.isSelected" @click="batchDelete(scope.selectedListIds)">
           批量删除角色
-        </el-button>
+        </el-button> -->
       </template>
       <template #produceDate="scope"> {{ moment(scope.row.produceDate).format("M/D/YYYY") }} </template>
       <template #checkDate="scope"> {{ moment(scope.row.checkDate).format("M/D/YYYY") }} </template>
@@ -22,7 +22,7 @@
       <template #operation="scope">
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
         <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', scope.row)">编辑</el-button>
-        <el-button type="primary" link :icon="Delete" @click="deleteAccount(scope.row)">删除</el-button>
+        <!-- <el-button type="primary" link :icon="Delete" @click="deleteAccount(scope.row)">删除</el-button> -->
       </template>
     </ProTable>
     <Drawer ref="drawerRef" />
@@ -33,14 +33,14 @@
 <script setup lang="tsx" name="useProTable">
 import { ref, reactive } from "vue";
 import { Role } from "@/api/interface";
-import { useHandleData } from "@/hooks/useHandleData";
+// import { useHandleData } from "@/hooks/useHandleData";
 import { ElMessage } from "element-plus";
 import ProTable from "@/components/ProTable/index.vue";
 import ImportExcel from "@/components/ImportExcel/index.vue";
 import Drawer from "./components/Drawer.vue";
 import { ProTableInstance, ColumnProps } from "@/components/ProTable/interface";
-import { CirclePlus, Delete, EditPen, View } from "@element-plus/icons-vue";
-import { getRoleList, addRole, editRole, delRole } from "@/api/modules/sys";
+import { CirclePlus, EditPen, View } from "@element-plus/icons-vue";
+import { getRoleList, addRole, editRole } from "@/api/modules/role";
 import moment from "moment";
 
 // ProTable 实例
@@ -94,18 +94,18 @@ const sortTable = ({ newIndex, oldIndex }: { newIndex?: number; oldIndex?: numbe
   ElMessage.success("修改列表排序成功");
 };
 
-// 删除角色
-const deleteAccount = async (params: Role.ResRoleList) => {
-  await useHandleData(delRole, { ids: [params.id] }, `删除【${params.roleName}】角色`);
-  proTable.value?.getTableList();
-};
+// // 删除角色
+// const deleteAccount = async (params: Role.ResRoleList) => {
+//   await useHandleData(delRole, { ids: [params.id] }, `删除【${params.roleName}】角色`);
+//   proTable.value?.getTableList();
+// };
 
-// 批量删除角色
-const batchDelete = async (ids: string[]) => {
-  await useHandleData(delRole, { ids }, "删除所选角色");
-  proTable.value?.clearSelection();
-  proTable.value?.getTableList();
-};
+// // 批量删除角色
+// const batchDelete = async (ids: string[]) => {
+//   await useHandleData(delRole, { ids }, "删除所选角色");
+//   proTable.value?.clearSelection();
+//   proTable.value?.getTableList();
+// };
 
 // 打开 drawer(新增、查看、编辑)
 const drawerRef = ref<InstanceType<typeof Drawer> | null>(null);

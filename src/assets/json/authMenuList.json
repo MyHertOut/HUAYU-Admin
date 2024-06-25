@@ -2,7 +2,7 @@
   "code": 200,
   "data": [
     {
-      "id":1,
+      "id": 1,
       "path": "/home/index",
       "name": "home",
       "component": "/home/index",
@@ -18,7 +18,7 @@
       }
     },
     {
-      "id":2,
+      "id": 2,
       "path": "/projectManage",
       "name": "projectManage",
       "title": "标识卡管理",
@@ -34,7 +34,7 @@
       }
     },
     {
-      "id":3,
+      "id": 3,
       "path": "/warehouseManage",
       "name": "warehouseManage",
       "title": "仓库管理",
@@ -50,7 +50,7 @@
       }
     },
     {
-      "id":4,
+      "id": 4,
       "path": "/stock",
       "name": "stock",
       "title": "库存",
@@ -66,7 +66,7 @@
       }
     },
     {
-      "id":5,
+      "id": 5,
       "path": "/record",
       "name": "record",
       "title": "进出库记录",
@@ -82,7 +82,7 @@
       },
       "children": [
         {
-          "id":51,
+          "id": 51,
           "path": "/record/warehousing",
           "name": "warehousing",
           "title": "入库记录",
@@ -98,7 +98,7 @@
           }
         },
         {
-          "id":52,
+          "id": 52,
           "path": "/record/outbound",
           "name": "outbound",
           "title": "出库记录",
@@ -114,7 +114,7 @@
           }
         },
         {
-          "id":53,
+          "id": 53,
           "path": "/record/summary",
           "name": "summary",
           "title": "进出库记录",
@@ -132,7 +132,7 @@
       ]
     },
     {
-      "id":6,
+      "id": 6,
       "path": "/system",
       "name": "system",
       "title": "系统管理",
@@ -148,7 +148,7 @@
       },
       "children": [
         {
-          "id":61,
+          "id": 61,
           "path": "/system/accountManage",
           "name": "accountManage",
           "title": "账号管理",
@@ -163,8 +163,8 @@
             "isKeepAlive": true
           }
         },
-        { 
-          "id":62,
+        {
+          "id": 62,
           "path": "/system/roleManage",
           "name": "roleManage",
           "title": "角色管理",
@@ -180,7 +180,7 @@
           }
         },
         {
-          "id":63,
+          "id": 63,
           "path": "/system/menuMange",
           "name": "menuMange",
           "title": "菜单管理",
@@ -196,23 +196,7 @@
           }
         },
         {
-          "id":64,
-          "path": "/system/dictManage",
-          "name": "dictManage",
-          "title": "字典管理",
-          "component": "/system/dictManage/index",
-          "meta": {
-            "icon": "Menu",
-            "title": "字典管理",
-            "isLink": "",
-            "isHide": false,
-            "isFull": false,
-            "isAffix": false,
-            "isKeepAlive": true
-          }
-        },
-        {
-          "id":65,
+          "id": 65,
           "path": "/system/boxTypeManage",
           "name": "boxTypeManage",
           "title": "箱型管理",
@@ -228,6 +212,22 @@
           }
         }
       ]
+    },
+    {
+      "id": 7,
+      "path": "/scanCode",
+      "name": "scanCode",
+      "title": "扫码",
+      "component": "/scanCode/index",
+      "meta": {
+        "icon": "Menu",
+        "title": "扫码",
+        "isLink": "",
+        "isHide": true,
+        "isFull": true,
+        "isAffix": false,
+        "isKeepAlive": true
+      }
     }
   ],
   "msg": "成功"

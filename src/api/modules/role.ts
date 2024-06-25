@@ -1,14 +1,5 @@
-import { ResPage, Role, Project } from "@/api/interface/index";
+import { ResPage, Role } from "@/api/interface/index";
 import http from "@/api";
-import boxType from "@/assets/json/boxType.json";
-/**
- * @name 系统模块
- */
-
-export const getBoxTypeList = (params: Project.ReqProjectParams) => {
-  return boxType;
-  return http.post<ResPage<Project.ResProjectList>>(`/material/findAll`, params);
-};
 
 /**
  * @name 角色模块

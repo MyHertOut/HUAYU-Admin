@@ -11,8 +11,6 @@
       <!-- 表格 header 按钮 -->
       <template #tableHeader="scope">
         <el-button v-auth="'add'" type="primary" :icon="CirclePlus" @click="openDrawer('新增')">新增箱型</el-button>
-        <el-button v-auth="'batchAdd'" type="primary" :icon="Upload" plain @click="batchAdd">批量添加箱型</el-button>
-        <el-button v-auth="'export'" type="primary" :icon="Download" plain @click="downloadFile">导出箱型数据</el-button>
         <el-button type="danger" :icon="Delete" plain :disabled="!scope.isSelected" @click="batchDelete(scope.selectedListIds)">
           批量删除箱型
         </el-button>
@@ -45,27 +43,21 @@
 
 <script setup lang="tsx" name="useProTable">
 import { ref, reactive } from "vue";
-import { Project } from "@/api/interface";
+import { ProjectCategory } from "@/api/interface";
 import { useHandleData } from "@/hooks/useHandleData";
-import { useDownload } from "@/hooks/useDownload";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ElMessage } from "element-plus";
 import ProTable from "@/components/ProTable/index.vue";
 import ImportExcel from "@/components/ImportExcel/index.vue";
 import ProjectDrawer from "./components/ProjectDrawer.vue";
 import { ProTableInstance, ColumnProps } from "@/components/ProTable/interface";
-import { CirclePlus, Delete, EditPen, Download, Upload, View } from "@element-plus/icons-vue";
-import {
-  // getUserList,
-  deleteUser,
-  editUser,
-  addUser,
-  exportUserInfo,
-  BatchAddUser
-  // getUserStatus,
-  // getUserGender
-} from "@/api/modules/user";
+import { CirclePlus, Delete, EditPen, View } from "@element-plus/icons-vue";
 
-import { getBoxTypeList } from "@/api/modules/sys";
+import {
+  getProjectCategoryList,
+  addProjectCategory,
+  editProjectCategory,
+  delProjectCategory
+} from "@/api/modules/projectCategory";
 
 // ProTable 实例
 const proTable = ref<ProTableInstance>();
@@ -85,19 +77,19 @@ const dataCallback = (data: any) => {
 };
 
 // 如果你想在请求之前对当前请求参数做一些操作，可以自定义如下函数：params 为当前所有的请求参数（包括分页），最后返回请求列表接口
-// 默认不做操作就直接在 ProTable 组件上绑定	:requestApi="getBoxTypeList"
+// 默认不做操作就直接在 ProTable 组件上绑定	:requestApi="getProjectCategoryList"
 const getTableList = (params: any) => {
   let newParams = JSON.parse(JSON.stringify(params));
   newParams.createTime && (newParams.startTime = newParams.createTime[0]);
   newParams.createTime && (newParams.endTime = newParams.createTime[1]);
   delete newParams.createTime;
-  return getBoxTypeList(newParams);
+  return getProjectCategoryList(newParams);
 };
 
 // 页面按钮权限（按钮权限既可以使用 hooks，也可以直接使用 v-auth 指令，指令适合直接绑定在按钮上，hooks 适合根据按钮权限显示不同的内容）
 
 // 表格配置项
-const columns = reactive<ColumnProps<Project.ResProjectList>[]>([
+const columns = reactive<ColumnProps<ProjectCategory.ResProjectCategoryList>[]>([
   { type: "selection", fixed: "left", width: 70 },
   { prop: "partNo", label: "件号", search: { el: "input" } },
   { prop: "materialProject", label: "项目名称" },
@@ -114,45 +106,26 @@ const sortTable = ({ newIndex, oldIndex }: { newIndex?: number; oldIndex?: numbe
 };
 
 // 删除箱型信息
-const deleteAccount = async (params: Project.ResProjectList) => {
-  await useHandleData(deleteUser, { id: [params.id] }, `删除【${params.partNo}】箱型`);
+const deleteAccount = async (params: ProjectCategory.ResProjectCategoryList) => {
+  await useHandleData(delProjectCategory, { ids: [params.id] }, `删除【${params.partNo}】箱型`);
   proTable.value?.getTableList();
 };
 
 // 批量删除箱型信息
-const batchDelete = async (id: string[]) => {
-  await useHandleData(deleteUser, { id }, "删除所选箱型信息");
+const batchDelete = async (ids: string[]) => {
+  await useHandleData(delProjectCategory, { ids }, "删除所选箱型信息");
   proTable.value?.clearSelection();
   proTable.value?.getTableList();
 };
 
-// 导出箱型列表
-const downloadFile = async () => {
-  ElMessageBox.confirm("确认导出箱型数据?", "温馨提示", { type: "warning" }).then(() =>
-    useDownload(exportUserInfo, "箱型列表", proTable.value?.searchParam)
-  );
-};
-
-// 批量添加箱型
-const dialogRef = ref<InstanceType<typeof ImportExcel> | null>(null);
-const batchAdd = () => {
-  const params = {
-    title: "箱型",
-    tempApi: exportUserInfo,
-    importApi: BatchAddUser,
-    getTableList: proTable.value?.getTableList
-  };
-  dialogRef.value?.acceptParams(params);
-};
-
 // 打开 drawer(新增、查看、编辑)
 const drawerRef = ref<InstanceType<typeof ProjectDrawer> | null>(null);
-const openDrawer = (title: string, row: Partial<Project.ResProjectList> = {}) => {
+const openDrawer = (title: string, row: Partial<ProjectCategory.ResProjectCategoryList> = {}) => {
   const params = {
     title,
     isView: title === "查看",
     row: { ...row },
-    api: title === "新增" ? addUser : title === "编辑" ? editUser : undefined,
+    api: title === "新增" ? addProjectCategory : title === "编辑" ? editProjectCategory : undefined,
     getTableList: proTable.value?.getTableList
   };
   drawerRef.value?.acceptParams(params);
