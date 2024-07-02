@@ -32,6 +32,7 @@ export interface UserState {
     id: any;
     username: string;
     loginame: string;
+    headerImage: string;
     password: string;
     position: string;
     department: string;

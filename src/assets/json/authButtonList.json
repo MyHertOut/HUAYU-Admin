@@ -5,7 +5,7 @@
     "projectManage": ["add", "batchAdd", "export", "batchDelete", "status"],
     "warehouseManage": ["add", "batchAdd", "export", "batchDelete", "status"],
     "accountManage": ["add", "batchAdd", "export", "batchDelete", "status"],
-    "boxTypeManage": ["add", "batchAdd", "export", "batchDelete", "status"],
+    "materialDicManage": ["add", "batchAdd", "export", "batchDelete", "status"],
     "roleManage": ["add", "batchAdd", "export", "batchDelete", "status"],
     "authButton": ["add", "edit", "delete", "import", "export"]
   },

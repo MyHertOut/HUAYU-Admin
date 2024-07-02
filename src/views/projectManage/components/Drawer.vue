@@ -19,21 +19,27 @@
           placeholder="输入查询，未找到的亦可创建"
           clearable
         >
-          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+          <el-option
+            @click="partNoChange(item)"
+            v-for="(item, key) in drawerProps.materialDicList"
+            :key="key"
+            :label="item.partNo"
+            :value="item.partNo"
+          />
         </el-select>
-      </el-form-item>
-      <el-form-item label="项目名称" prop="materialProject">
-        <el-input
-          v-model="drawerProps.row!.materialProject"
-          :placeholder="isPartNoHave ? '项目名称由【件号】查出' : '请输入项目名称'"
-          clearable
-          :disabled="isPartNoHave"
-        ></el-input>
       </el-form-item>
       <el-form-item label="零件名称" prop="materialName">
         <el-input
           v-model="drawerProps.row!.materialName"
           :placeholder="isPartNoHave ? '零件名称由【件号】查出' : '请输入零件名称'"
+          clearable
+          :disabled="isPartNoHave"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="项目名称" prop="materialProject">
+        <el-input
+          v-model="drawerProps.row!.materialProject"
+          :placeholder="isPartNoHave ? '项目名称由【件号】查出' : '请输入项目名称'"
           clearable
           :disabled="isPartNoHave"
         ></el-input>
@@ -67,40 +73,32 @@
   </el-drawer>
 </template>
 
-<script setup lang="ts" name="UserDrawer">
+<script setup lang="ts" name="projectManage">
 import { ref, reactive, computed } from "vue";
 import { ElMessage, FormInstance } from "element-plus";
 import { Project } from "@/api/interface";
 import moment from "moment";
 
-const options = [
-  {
-    value: "500109-00257-34",
-    label: "500109-00257-34"
-  },
-  {
-    value: "500109-00257-32",
-    label: "500109-00257-32"
-  },
-  {
-    value: "500109-00257-36",
-    label: "500109-00257-36"
-  }
-];
 const isPartNoHave = computed(() => {
   let partNo = drawerProps.value.row.partNo;
   if (!partNo) {
     return true;
   } else {
-    let index = options.findIndex(e => e.label === partNo);
+    let index = drawerProps.value.materialDicList.findIndex(e => e.partNo === partNo);
     return index !== -1 ? true : false;
   }
 });
 
+const partNoChange = (value: any) => {
+  console.log(value);
+  drawerProps.value.row.materialName = value.materialName;
+  drawerProps.value.row.materialProject = value.projectName;
+};
+
 const rules = reactive({
   partNo: [{ required: true, message: "请选择或创建件号" }],
-  materialProject: [{ required: true, message: "请输入项目名称" }],
   materialName: [{ required: true, message: "请输入零件名称" }],
+  materialProject: [{ required: true, message: "请输入项目名称" }],
   batchNo: [{ required: true, message: "请输入批次号" }],
   materialNum: [{ required: true, message: "请输入数量" }],
   shift: [{ required: true, message: "请选择班次" }],
@@ -110,6 +108,7 @@ const rules = reactive({
 interface DrawerProps {
   title: string;
   isView: boolean;
+  materialDicList?: any;
   row: Partial<Project.ResProjectList>;
   api?: (params: any) => Promise<any>;
   getTableList?: () => void;
@@ -141,6 +140,8 @@ const handleSubmit = () => {
   ruleFormRef.value!.validate(async valid => {
     if (!valid) return;
     try {
+      delete drawerProps.value.row.createTime;
+      delete drawerProps.value.row.updateTime;
       await drawerProps.value.api!(drawerProps.value.row);
       ElMessage.success({ message: `${drawerProps.value.title}标识卡成功！` });
       drawerProps.value.getTableList!();

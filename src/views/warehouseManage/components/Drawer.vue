@@ -25,7 +25,21 @@
         <el-input v-model="drawerProps.row!.depotArea" placeholder="请输入仓库区域" clearable></el-input>
       </el-form-item>
       <el-form-item label="负责人" prop="depotOwner">
-        <el-input v-model="drawerProps.row!.depotOwner" placeholder="请输入仓库负责人" clearable></el-input>
+        <el-select
+          v-model="drawerProps.row!.depotOwner"
+          filterable
+          default-first-option
+          placeholder="请输入仓库负责人"
+          clearable
+          multiple
+        >
+          <el-option
+            v-for="(item, key) in drawerProps.userList"
+            :key="key"
+            :label="`${item.username}(${item.phoneNum})`"
+            :value="item.id"
+          />
+        </el-select>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -52,6 +66,7 @@ const rules = reactive({
 interface DrawerProps {
   title: string;
   isView: boolean;
+  userList?: any;
   row: Partial<Depot.ResDepotList>;
   api?: (params: any) => Promise<any>;
   getTableList?: () => void;
@@ -68,6 +83,9 @@ const drawerProps = ref<DrawerProps>({
 const acceptParams = (params: DrawerProps) => {
   drawerProps.value = params;
   drawerVisible.value = true;
+  if (drawerProps.value.title !== "新增") {
+    drawerProps.value.row.depotOwner = JSON.parse(drawerProps.value.row.depotOwner);
+  }
 };
 
 // 提交数据（新增/编辑）
@@ -76,6 +94,7 @@ const handleSubmit = () => {
   ruleFormRef.value!.validate(async valid => {
     if (!valid) return;
     try {
+      drawerProps.value.row.depotOwner = JSON.stringify(drawerProps.value.row.depotOwner);
       await drawerProps.value.api!(drawerProps.value.row);
       ElMessage.success({ message: `${drawerProps.value.title}仓库成功！` });
       drawerProps.value.getTableList!();

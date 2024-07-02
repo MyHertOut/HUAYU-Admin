@@ -33,24 +33,9 @@
         "isKeepAlive": true
       }
     },
+   
     {
       "id": 3,
-      "path": "/warehouseManage",
-      "name": "warehouseManage",
-      "title": "仓库管理",
-      "component": "/warehouseManage/index",
-      "meta": {
-        "icon": "Briefcase",
-        "title": "仓库管理",
-        "isLink": "",
-        "isHide": false,
-        "isFull": false,
-        "isAffix": false,
-        "isKeepAlive": true
-      }
-    },
-    {
-      "id": 4,
       "path": "/stock",
       "name": "stock",
       "title": "库存",
@@ -66,7 +51,7 @@
       }
     },
     {
-      "id": 5,
+      "id": 4,
       "path": "/record",
       "name": "record",
       "title": "进出库记录",
@@ -82,7 +67,7 @@
       },
       "children": [
         {
-          "id": 51,
+          "id": 41,
           "path": "/record/warehousing",
           "name": "warehousing",
           "title": "入库记录",
@@ -98,7 +83,7 @@
           }
         },
         {
-          "id": 52,
+          "id": 42,
           "path": "/record/outbound",
           "name": "outbound",
           "title": "出库记录",
@@ -114,7 +99,7 @@
           }
         },
         {
-          "id": 53,
+          "id": 43,
           "path": "/record/summary",
           "name": "summary",
           "title": "进出库记录",
@@ -132,7 +117,7 @@
       ]
     },
     {
-      "id": 6,
+      "id": 5,
       "path": "/system",
       "name": "system",
       "title": "系统管理",
@@ -148,7 +133,7 @@
       },
       "children": [
         {
-          "id": 61,
+          "id": 51,
           "path": "/system/accountManage",
           "name": "accountManage",
           "title": "账号管理",
@@ -164,7 +149,7 @@
           }
         },
         {
-          "id": 62,
+          "id": 52,
           "path": "/system/roleManage",
           "name": "roleManage",
           "title": "角色管理",
@@ -180,7 +165,39 @@
           }
         },
         {
-          "id": 63,
+          "id": 53,
+          "path": "/system/warehouseManage",
+          "name": "warehouseManage",
+          "title": "仓库管理",
+          "component": "/warehouseManage/index",
+          "meta": {
+            "icon": "Menu",
+            "title": "仓库管理",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": false,
+            "isKeepAlive": true
+          }
+        },
+        {
+          "id": 54,
+          "path": "/system/materialDicManage",
+          "name": "materialDicManage",
+          "title": "主数据管理",
+          "component": "/system/materialDicManage/index",
+          "meta": {
+            "icon": "Menu",
+            "title": "主数据管理",
+            "isLink": "",
+            "isHide": false,
+            "isFull": false,
+            "isAffix": false,
+            "isKeepAlive": true
+          }
+        },
+        {
+          "id": 55,
           "path": "/system/menuMange",
           "name": "menuMange",
           "title": "菜单管理",
@@ -194,27 +211,11 @@
             "isAffix": false,
             "isKeepAlive": true
           }
-        },
-        {
-          "id": 65,
-          "path": "/system/boxTypeManage",
-          "name": "boxTypeManage",
-          "title": "箱型管理",
-          "component": "/system/boxTypeManage/index",
-          "meta": {
-            "icon": "Menu",
-            "title": "箱型管理",
-            "isLink": "",
-            "isHide": false,
-            "isFull": false,
-            "isAffix": false,
-            "isKeepAlive": true
-          }
         }
       ]
     },
     {
-      "id": 7,
+      "id": 6,
       "path": "/scanCode",
       "name": "scanCode",
       "title": "扫码",

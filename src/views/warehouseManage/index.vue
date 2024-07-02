@@ -41,13 +41,14 @@ import Drawer from "./components/Drawer.vue";
 import { ProTableInstance, ColumnProps } from "@/components/ProTable/interface";
 import { CirclePlus, Delete, EditPen, View } from "@element-plus/icons-vue";
 import { getDepotList, addDepot, editDepot, delDepot } from "@/api/modules/depot";
+import { findUserList } from "@/api/modules/user";
 import moment from "moment";
 
 // ProTable 实例
 const proTable = ref<ProTableInstance>();
 
 // 如果表格需要初始化请求参数，直接定义传给 ProTable (之后每次请求都会自动带上该参数，此参数更改之后也会一直带上，改变此参数会自动刷新表格数据)
-const initParam = reactive({ type: 1 });
+const initParam = reactive({});
 
 // dataCallback 是对于返回的表格数据做处理，如果你后台返回的数据不是 list && total && pageNo && pageSize 这些字段，可以在这里进行处理成这些字段
 // 或者直接去 hooks/useTable.ts 文件中把字段改为你后端对应的就行
@@ -80,10 +81,37 @@ const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
   { prop: "depotTypeName", label: "类型" },
   { prop: "depotAddress", label: "地址" },
   { prop: "depotArea", label: "区域" },
-  { prop: "depotOwner", label: "负责人" },
+  {
+    prop: "depotOwner",
+    label: "负责人",
+    render: scope => {
+      return <>{dealName(scope.row.depotOwner)}</>;
+    },
+    width: 300
+  },
   { prop: "createTime", label: "创建时间", width: 180 },
   { prop: "operation", label: "操作", fixed: "right", width: 220 }
 ]);
+
+const userList: any = ref([]);
+const GetUserList = async () => {
+  userList.value = [];
+  let res: any = await findUserList();
+  if (res.code === "200") {
+    userList.value = res.data;
+    console.log(userList.value);
+  }
+};
+GetUserList();
+
+const dealName = val => {
+  let text = "";
+  JSON.parse(val).forEach(id => {
+    let item = userList.value.filter(e => e.id === id)[0];
+    text += `${item.username}(${item.phoneNum}) `;
+  });
+  return text;
+};
 
 // 表格拖拽排序
 const sortTable = ({ newIndex, oldIndex }: { newIndex?: number; oldIndex?: number }) => {
@@ -111,6 +139,7 @@ const openDrawer = (title: string, row: Partial<Depot.ResDepotList> = {}) => {
   const params = {
     title,
     isView: title === "查看",
+    userList,
     row: { ...row },
     api: title === "新增" ? addDepot : title === "编辑" ? editDepot : undefined,
     getTableList: proTable.value?.getTableList

@@ -14,8 +14,14 @@
       </el-form-item>
       <el-form-item label="状态" prop="roleStatus">
         <el-radio-group v-model="drawerProps.row!.roleStatus">
-          <el-radio :value="1" size="large">正常</el-radio>
-          <el-radio :value="0" size="large">停用</el-radio>
+          <el-radio :value="0" size="large">启用</el-radio>
+          <el-radio :value="1" size="large">停用</el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item label="类型" prop="roleType">
+        <el-radio-group v-model="drawerProps.row!.roleType">
+          <el-radio :value="1" size="large">普通角色</el-radio>
+          <el-radio :value="2" size="large">超级角色</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="菜单权限" prop="menuIds">
@@ -29,7 +35,7 @@
   </el-drawer>
 </template>
 
-<script setup lang="ts" name="UserDrawer">
+<script setup lang="ts" name="Drawer">
 import { ref, reactive } from "vue";
 import { ElMessage, FormInstance } from "element-plus";
 import { Role } from "@/api/interface";
@@ -37,8 +43,9 @@ import authMenuList from "@/assets/json/authMenuList.json";
 
 const rules = reactive({
   roleName: [{ required: true, message: "请输入角色名称" }],
-  roleStatus: [{ required: true, message: "请输入角色编号" }],
-  menuIds: [{ required: true, message: "请输入角色类型" }]
+  roleStatus: [{ required: true, message: "请选择角色状态" }],
+  roleType: [{ required: true, message: "请选择角色类型" }],
+  menuIds: [{ required: true, message: "请选择菜单权限" }]
 });
 
 const menuList = authMenuList.data;
@@ -69,7 +76,8 @@ const drawerProps = ref<DrawerProps>({
 const acceptParams = (params: DrawerProps) => {
   drawerProps.value = params;
   if (drawerProps.value.title === "新增") {
-    drawerProps.value.row.roleStatus = 1;
+    drawerProps.value.row.roleStatus = 0;
+    drawerProps.value.row.roleType = 1;
   } else {
     drawerProps.value.row.menuIds = JSON.parse(drawerProps.value.row.menuIds);
   }
@@ -82,6 +90,8 @@ const handleSubmit = () => {
   ruleFormRef.value!.validate(async valid => {
     if (!valid) return;
     try {
+      delete drawerProps.value.row.createTime;
+      delete drawerProps.value.row.updateTime;
       drawerProps.value.row.menuIds = JSON.stringify(drawerProps.value.row.menuIds);
       await drawerProps.value.api!(drawerProps.value.row);
       ElMessage.success({ message: `${drawerProps.value.title}角色成功！` });

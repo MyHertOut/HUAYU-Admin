@@ -11,18 +11,13 @@
       <!-- 表格 header 按钮 -->
       <template #tableHeader="">
         <el-button v-auth="'add'" type="primary" :icon="CirclePlus" @click="openDrawer('新增')">新增角色</el-button>
-        <!-- <el-button type="danger" :icon="Delete" plain :disabled="!scope.isSelected" @click="batchDelete(scope.selectedListIds)">
-          批量删除角色
-        </el-button> -->
       </template>
-      <template #produceDate="scope"> {{ moment(scope.row.produceDate).format("M/D/YYYY") }} </template>
-      <template #checkDate="scope"> {{ moment(scope.row.checkDate).format("M/D/YYYY") }} </template>
       <template #createTime="scope"> {{ moment(scope.row.createTime).format("YYYY-MM-DD hh:mm:ss") }} </template>
+      <template #updateTime="scope"> {{ moment(scope.row.createTime).format("YYYY-MM-DD hh:mm:ss") }} </template>
       <!-- 表格操作 -->
       <template #operation="scope">
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
         <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', scope.row)">编辑</el-button>
-        <!-- <el-button type="primary" link :icon="Delete" @click="deleteAccount(scope.row)">删除</el-button> -->
       </template>
     </ProTable>
     <Drawer ref="drawerRef" />
@@ -30,10 +25,9 @@
   </div>
 </template>
 
-<script setup lang="tsx" name="useProTable">
+<script setup lang="tsx" name="roleManage">
 import { ref, reactive } from "vue";
 import { Role } from "@/api/interface";
-// import { useHandleData } from "@/hooks/useHandleData";
 import { ElMessage } from "element-plus";
 import ProTable from "@/components/ProTable/index.vue";
 import ImportExcel from "@/components/ImportExcel/index.vue";
@@ -80,10 +74,20 @@ const columns = reactive<ColumnProps<Role.ResRoleList>[]>([
     prop: "roleStatus",
     label: "状态",
     render: scope => {
-      return <>{<el-tag type={scope.row.roleStatus ? "success" : "danger"}>{scope.row.roleStatus ? "启用" : "停用"}</el-tag>}</>;
+      return (
+        <>{<el-tag type={!scope.row.roleStatus ? "success" : "danger"}>{!scope.row.roleStatus ? "启用" : "停用"}</el-tag>}</>
+      );
+    }
+  },
+  {
+    prop: "roleType",
+    label: "类型",
+    render: scope => {
+      return <>{scope.row.roleType === 1 ? "普通角色" : "超级角色"}</>;
     }
   },
   { prop: "createTime", label: "创建时间", width: 180 },
+  { prop: "updateTime", label: "更新时间", width: 180 },
   { prop: "operation", label: "操作", fixed: "right", width: 220 }
 ]);
 
@@ -93,19 +97,6 @@ const sortTable = ({ newIndex, oldIndex }: { newIndex?: number; oldIndex?: numbe
   console.log(proTable.value?.tableData);
   ElMessage.success("修改列表排序成功");
 };
-
-// // 删除角色
-// const deleteAccount = async (params: Role.ResRoleList) => {
-//   await useHandleData(delRole, { ids: [params.id] }, `删除【${params.roleName}】角色`);
-//   proTable.value?.getTableList();
-// };
-
-// // 批量删除角色
-// const batchDelete = async (ids: string[]) => {
-//   await useHandleData(delRole, { ids }, "删除所选角色");
-//   proTable.value?.clearSelection();
-//   proTable.value?.getTableList();
-// };
 
 // 打开 drawer(新增、查看、编辑)
 const drawerRef = ref<InstanceType<typeof Drawer> | null>(null);

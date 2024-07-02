@@ -5,6 +5,8 @@ import { createProxy } from "./build/proxy";
 import { createVitePlugins } from "./build/plugins";
 import pkg from "./package.json";
 import dayjs from "dayjs";
+// import path from "path";
+// import * as fs from "fs";
 
 const { dependencies, devDependencies, name, version } = pkg;
 const __APP_INFO__ = {
@@ -38,6 +40,10 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       }
     },
     server: {
+      // https: {
+      //   cert: fs.readFileSync(path.join(__dirname, "keys/cert.crt")),
+      //   key: fs.readFileSync(path.join(__dirname, "keys/cert.key"))
+      // },
       host: "0.0.0.0",
       port: viteEnv.VITE_PORT,
       open: viteEnv.VITE_OPEN,

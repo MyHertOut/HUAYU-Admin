@@ -54,18 +54,21 @@ export namespace User {
     email: string;
     address: string;
     createTime: string[];
-    userstatus: number;
+    userStatus: number;
   }
   export interface ResUserList {
     id: string;
+    headerImage: string;
     username: string;
-    userHeaderIcon: string;
-    phone: string;
+    loginName: string;
+    phoneNum: any;
     department: string;
+    password: string;
     position: string;
-    userType: string;
-    userstatus: number;
+    roles: object[];
+    userStatus: number;
     createTime: string;
+    updateTime: string;
   }
   export interface ResStatus {
     userLabel: string;
@@ -122,7 +125,7 @@ export namespace Depot {
     depotTypeName: string;
     depotAddress: string;
     depotArea: string;
-    depotOwner: string;
+    depotOwner: any;
     remark: string;
     createTime: string;
     updateTime: string;
@@ -137,6 +140,7 @@ export namespace Role {
     id: number;
     roleName: string;
     roleStatus: number;
+    roleType: number;
     menuIds: any;
     createTime: string;
     updateTime: string;
@@ -144,27 +148,19 @@ export namespace Role {
   }
 }
 
-// 箱型管理模块
-export namespace ProjectCategory {
-  export interface ReqProjectCategoryParams extends ReqPage {}
-  export interface ResProjectCategoryList {
+// 主数据管理模块
+export namespace MaterialDic {
+  export interface ReqMaterialDicParams extends ReqPage {}
+  export interface ResMaterialDicList {
     id: number;
-    materialProject: string; // 项目名册
-    materialName: string; // 零件名称
-    partNo: string; // 件号
-    produceDate: string; // 生产日期
-    batchNo: string; // 批次
-    materialNum: number; // 数量
-    shift: string; // 班次
-    checker: string; // 检验员名称
-    checkDate: string; // 检验日期
-    categoryName: string;
-    weight: string;
-    categoryId: number; // 物品类型ID
-    storage: number;
+    partNo: string;
+    projectName: string;
+    materialName: string;
+    reservedAttr1: string;
+    reservedAttr2: string;
+    reservedAttr3: string;
     createTime: string;
     updateTime: string;
-    remark: string;
     deleteFlag: number;
   }
 }

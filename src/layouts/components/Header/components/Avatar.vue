@@ -1,17 +1,19 @@
 <template>
   <el-dropdown trigger="click">
     <div class="avatar">
-      <img src="@/assets/images/avatar.gif" alt="avatar" />
+      <img v-if="!headerImage" src="@/assets/images/avatar.gif" alt="avatar" />
+      <img v-else :src="headerImage" alt="avatar" />
     </div>
     <template #dropdown>
       <el-dropdown-menu>
-        <el-dropdown-item @click="openDialog('infoRef')">
+        <el-dropdown-item v-if="false" @click="openDialog('infoRef')">
           <el-icon><User /></el-icon>{{ $t("header.personalData") }}
         </el-dropdown-item>
-        <el-dropdown-item @click="openDialog('passwordRef')">
+        <el-dropdown-item v-if="false" @click="openDialog('passwordRef')">
           <el-icon><Edit /></el-icon>{{ $t("header.changePassword") }}
         </el-dropdown-item>
-        <el-dropdown-item divided @click="logout">
+        <!-- divided -->
+        <el-dropdown-item @click="logout">
           <el-icon><SwitchButton /></el-icon>{{ $t("header.logout") }}
         </el-dropdown-item>
       </el-dropdown-menu>
@@ -27,7 +29,7 @@
 import { ref } from "vue";
 import { LOGIN_URL } from "@/config";
 import { useRouter } from "vue-router";
-import { logoutApi } from "@/api/modules/login";
+// import { logoutApi } from "@/api/modules/login";
 import { useUserStore } from "@/stores/modules/user";
 import { ElMessageBox, ElMessage } from "element-plus";
 import InfoDialog from "./InfoDialog.vue";
@@ -35,6 +37,7 @@ import PasswordDialog from "./PasswordDialog.vue";
 
 const router = useRouter();
 const userStore = useUserStore();
+const headerImage = ref(userStore.userInfo.headerImage);
 
 // 退出登录
 const logout = () => {
@@ -44,7 +47,7 @@ const logout = () => {
     type: "warning"
   }).then(async () => {
     // 1.执行退出登录接口
-    await logoutApi();
+    // await logoutApi();
 
     // 2.清除 Token
     userStore.setToken("");
