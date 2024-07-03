@@ -214,7 +214,7 @@ const printFun = async (row: any) => {
     worksheet.getRow(8 * i + 7).font = globalFontStyle;
 
     let printNo = `${printDate}-${i + 1}`;
-    let QRCodeUrl = `http://47.109.87.12:5696/scanCode?id=${row.id}&no=${printNo}`;
+    let QRCodeUrl = `https://47.109.87.12/scanCode?id=${row.id}&no=${printNo}`;
     let base64Image = await QRCode.toDataURL(QRCodeUrl); // 替换为你的 base64 图片数据（不包括前缀 data:image/png;base64,）
     base64Image = base64Image.replace("data:image/png;base64,", "");
     const imageArrayBuffer = base64ToUint8Array(base64Image);
