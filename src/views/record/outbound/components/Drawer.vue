@@ -10,7 +10,7 @@
       :hide-required-asterisk="drawerProps.isView"
       class="onlyRead"
     >
-      <div style="padding: 10px; background: #efefef">
+      <div style="padding: 10px; margin-bottom: 10px; border: 1px solid #efefef">
         <div style="margin-bottom: 15px">零件信息</div>
         <el-form-item label="编号" prop="qrSerialNo">
           <el-input v-model="drawerProps.row!.qrSerialNo" clearable></el-input>
@@ -41,7 +41,7 @@
         </el-form-item>
       </div>
 
-      <div style="padding: 10px; background: #efefef">
+      <div style="padding: 10px; margin-bottom: 10px; border: 1px solid #efefef">
         <div style="margin-bottom: 15px">出库仓库</div>
         <el-form-item label="仓库名称" prop="sourceDepotName">
           <el-input v-model="drawerProps.row!.sourceDepotName" clearable></el-input>
@@ -54,7 +54,7 @@
         </el-form-item>
       </div>
 
-      <div style="padding: 10px; background: #efefef">
+      <div style="padding: 10px; margin-bottom: 10px; border: 1px solid #efefef">
         <div style="margin-bottom: 15px">操作信息</div>
         <el-form-item label="操作人" prop="operatorName">
           <el-input v-model="drawerProps.row!.operatorName" clearable></el-input>

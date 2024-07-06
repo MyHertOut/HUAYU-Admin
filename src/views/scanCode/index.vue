@@ -182,6 +182,7 @@ onBeforeUnmount(() => {
   width: 100vw;
   height: 100vh;
   padding: 16px;
+  color: #000000;
   background: #ffffff;
   .videoBox {
     width: 100%;

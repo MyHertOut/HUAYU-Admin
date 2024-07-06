@@ -87,7 +87,10 @@
 }
 
 @media screen and (width <= 600px) {
+  .login-box{
+    padding: 0 !important;
+  }
   .login-form {
-    width: 97% !important;
+    width: 77% !important;
   }
 }
