@@ -100,13 +100,13 @@
         },
         {
           "id": 43,
-          "path": "/record/summary",
-          "name": "summary",
-          "title": "进出库记录",
-          "component": "/record/summary/index",
+          "path": "/record/transfer",
+          "name": "transfer",
+          "title": "转库记录",
+          "component": "/record/transfer/index",
           "meta": {
             "icon": "Menu",
-            "title": "进出库记录",
+            "title": "转库记录",
             "isLink": "",
             "isHide": false,
             "isFull": false,
@@ -206,7 +206,7 @@
             "icon": "Menu",
             "title": "菜单管理",
             "isLink": "",
-            "isHide": false,
+            "isHide": true,
             "isFull": false,
             "isAffix": false,
             "isKeepAlive": true

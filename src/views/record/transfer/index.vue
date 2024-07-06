@@ -33,7 +33,7 @@
   </div>
 </template>
 
-<script setup lang="tsx" name="outbound">
+<script setup lang="tsx" name="transfer">
 import { ref, reactive } from "vue";
 import { useHandleData } from "@/hooks/useHandleData";
 import { ElMessage } from "element-plus";
@@ -49,7 +49,7 @@ import moment from "moment";
 const proTable = ref<ProTableInstance>();
 
 // 如果表格需要初始化请求参数，直接定义传给 ProTable (之后每次请求都会自动带上该参数，此参数更改之后也会一直带上，改变此参数会自动刷新表格数据)
-const initParam = reactive({ operateType: 2 });
+const initParam = reactive({ operateType: 3 });
 
 // dataCallback 是对于返回的表格数据做处理，如果你后台返回的数据不是 list && total && pageNo && pageSize 这些字段，可以在这里进行处理成这些字段
 // 或者直接去 hooks/useTable.ts 文件中把字段改为你后端对应的就行
@@ -80,10 +80,12 @@ const columns = reactive<ColumnProps<any>[]>([
   { prop: "partNo", label: "件号", search: { el: "input" }, width: 180 },
   { prop: "qrSerialNo", label: "编号" },
   { prop: "materialName", label: "零件名称" },
-  { prop: "sourceDepotName", label: "出库仓库" },
-  { prop: "sourceLocationNo", label: "出库库位" },
-  { prop: "createTime", label: "出库时间", width: 180 },
-  { prop: "operatorName", label: "出库人", width: 180 },
+  { prop: "sourceDepotName", label: "来源仓库" },
+  { prop: "sourceLocationNo", label: "来源库位" },
+  { prop: "targetDepotName", label: "目标仓库" },
+  { prop: "targetLocationNo", label: "目标库位" },
+  { prop: "createTime", label: "转库时间", width: 180 },
+  { prop: "operatorName", label: "转库人", width: 180 },
   { prop: "operation", label: "操作", fixed: "right", width: 220 }
 ]);
 

@@ -22,7 +22,7 @@
       <template #operation="scope">
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
         <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', scope.row)">编辑</el-button>
-        <el-button type="primary" link :icon="Delete" @click="deleteAccount(scope.row)">删除</el-button>
+        <el-button type="primary" link :icon="Delete" @click="deleteFun(scope.row)">删除</el-button>
       </template>
     </ProTable>
     <Drawer ref="drawerRef" />
@@ -30,7 +30,7 @@
   </div>
 </template>
 
-<script setup lang="tsx" name="useProTable">
+<script setup lang="tsx" name="warehouseManage">
 import { ref, reactive } from "vue";
 import { Depot } from "@/api/interface";
 import { useHandleData } from "@/hooks/useHandleData";
@@ -121,7 +121,7 @@ const sortTable = ({ newIndex, oldIndex }: { newIndex?: number; oldIndex?: numbe
 };
 
 // 删除仓库
-const deleteAccount = async (params: Depot.ResDepotList) => {
+const deleteFun = async (params: Depot.ResDepotList) => {
   await useHandleData(delDepot, { ids: [params.id] }, `删除【${params.depotName}】仓库`);
   proTable.value?.getTableList();
 };

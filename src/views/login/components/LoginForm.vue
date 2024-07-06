@@ -30,7 +30,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { HOME_URL } from "@/config";
+// import { HOME_URL } from "@/config";
 import { getTimeState } from "@/utils";
 import { Login } from "@/api/interface";
 import { ElNotification } from "element-plus";
@@ -42,6 +42,7 @@ import { initDynamicRouter } from "@/routers/modules/dynamicRouter";
 import { CircleClose, UserFilled } from "@element-plus/icons-vue";
 import type { ElForm } from "element-plus";
 import md5 from "md5";
+import { useAuthStore } from "@/stores/modules/auth";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -75,13 +76,16 @@ const login = (formEl: FormInstance | undefined) => {
       userStore.setUserInfo(data.userInfo);
       // 2.添加动态路由
       await initDynamicRouter();
+      const authStore = useAuthStore();
+      const authMenuListGet = authStore.authMenuListGet;
 
       // 3.清空 tabs、keepAlive 数据
       tabsStore.setTabs([]);
       keepAliveStore.setKeepAliveName([]);
 
       // 4.跳转到首页
-      router.push(HOME_URL);
+      let firstPath = authMenuListGet[0].path;
+      router.push(firstPath);
       ElNotification({
         title: getTimeState(),
         message: "欢迎登录 华裕科技仓储管理系统",

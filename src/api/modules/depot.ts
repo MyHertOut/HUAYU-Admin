@@ -1,25 +1,26 @@
 import { ResPage, Depot } from "@/api/interface/index";
+import { PORT4 } from "@/api/config/servicePort";
 import http from "@/api";
 
 /**
  * @name 仓库模块
  */
-// 获取产品标识卡列表
 export const getDepotList = (params: Depot.ReqDepotParams) => {
-  return http.post<ResPage<Depot.ResDepotList>>(`/depot/findAll`, params);
+  return http.post<ResPage<Depot.ResDepotList>>(PORT4 + `/depot/findAll`, params);
 };
 
-// 新增
 export const addDepot = (params: Depot.ReqDepotParams) => {
-  return http.post<ResPage<Depot.ResDepotList>>(`/depot/add`, params);
+  return http.post<ResPage<Depot.ResDepotList>>(PORT4 + `/depot/add`, params);
 };
 
-// 编辑
 export const editDepot = (params: Depot.ReqDepotParams) => {
-  return http.put<ResPage<Depot.ResDepotList>>(`/depot/update`, params);
+  return http.put<ResPage<Depot.ResDepotList>>(PORT4 + `/depot/update`, params);
 };
 
-// 删除
 export const delDepot = (params: { ids: number[] }) => {
-  return http.deleteBody(`/depot/delete`, params);
+  return http.deleteBody(PORT4 + `/depot/delete`, params);
+};
+
+export const findDepotList = () => {
+  return http.post<ResPage<Depot.ResDepotList>>(PORT4 + `/depot/findDepotList`, {}, { loading: false });
 };

@@ -1,25 +1,35 @@
+// import { Upload } from "@/api/interface/index";
 import { ResPage, Project } from "@/api/interface/index";
+import { PORT4 } from "@/api/config/servicePort";
 import http from "@/api";
 
 /**
  * @name 产品模块
  */
-// 获取产品标识卡列表
 export const getProjectList = (params: Project.ReqProjectParams) => {
-  return http.post<ResPage<Project.ResProjectList>>(`/material/findAll`, params);
+  return http.post<ResPage<Project.ResProjectList>>(PORT4 + `/material/findAll`, params);
 };
 
-// 新增
 export const addProject = (params: Project.ReqProjectParams) => {
-  return http.post<ResPage<Project.ResProjectList>>(`/material/add`, params);
+  return http.post<ResPage<Project.ResProjectList>>(PORT4 + `/material/add`, params);
 };
 
-// 编辑
 export const editProject = (params: Project.ReqProjectParams) => {
-  return http.put<ResPage<Project.ResProjectList>>(`/material/update`, params);
+  return http.put<ResPage<Project.ResProjectList>>(PORT4 + `/material/update`, params);
 };
 
-// 删除
 export const delProject = (params: { ids: number[] }) => {
-  return http.deleteBody(`/material/delete`, params);
+  return http.deleteBody(PORT4 + `/material/delete`, params);
+};
+
+export const exportExcelTemplate = () => {
+  return http.download(PORT4 + `/material/exportExcelTemplate`);
+};
+
+export const exportExcel = () => {
+  return http.get(PORT4 + `/material/exportExcel`);
+};
+
+export const importExcel = (params: FormData) => {
+  return http.download(PORT4 + `/material/importExcel`, params);
 };

@@ -13,18 +13,19 @@ export const useDownload = async (
   tempName: string,
   params: any = {},
   isNotify: boolean = true,
-  fileType: string = ".xlsx"
+  fileType: string = ".xls"
 ) => {
   if (isNotify) {
     ElNotification({
       title: "温馨提示",
       message: "如果数据庞大会导致下载缓慢哦，请您耐心等待！",
       type: "info",
-      duration: 3000
+      duration: 1000
     });
   }
   try {
     const res = await api(params);
+    // return;
     const blob = new Blob([res]);
     // 兼容 edge 不支持 createObjectURL 方法
     if ("msSaveOrOpenBlob" in navigator) return window.navigator.msSaveOrOpenBlob(blob, tempName + fileType);

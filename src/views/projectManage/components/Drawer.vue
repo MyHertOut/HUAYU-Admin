@@ -65,6 +65,9 @@
       <el-form-item label="检验日期" prop="checkDate">
         <el-input v-model="drawerProps.row!.checkDate" placeholder="默认当天" clearable disabled></el-input>
       </el-form-item>
+      <el-form-item label="所属单位" prop="materialBelongTo">
+        <el-input v-model="drawerProps.row!.materialBelongTo" placeholder="请输入所属单位" clearable></el-input>
+      </el-form-item>
     </el-form>
     <template #footer>
       <el-button @click="drawerVisible = false">取消</el-button>
@@ -124,7 +127,7 @@ const drawerProps = ref<DrawerProps>({
 // 接收父组件传过来的参数
 const acceptParams = (params: DrawerProps) => {
   drawerProps.value = params;
-  if (drawerProps.value.title === "新增") {
+  if (drawerProps.value.title === "新增" || drawerProps.value.title === "复制") {
     drawerProps.value.row.produceDate = moment(new Date()).format("M/D/YYYY");
     drawerProps.value.row.checkDate = moment(new Date()).format("M/D/YYYY");
   } else if (drawerProps.value.title === "编辑") {
@@ -142,6 +145,9 @@ const handleSubmit = () => {
     try {
       delete drawerProps.value.row.createTime;
       delete drawerProps.value.row.updateTime;
+      if (drawerProps.value.title === "复制") {
+        delete drawerProps.value.row.id;
+      }
       await drawerProps.value.api!(drawerProps.value.row);
       ElMessage.success({ message: `${drawerProps.value.title}标识卡成功！` });
       drawerProps.value.getTableList!();

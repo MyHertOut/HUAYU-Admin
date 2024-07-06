@@ -11,6 +11,8 @@
       <!-- 表格 header 按钮 -->
       <template #tableHeader="scope">
         <el-button v-auth="'add'" type="primary" :icon="CirclePlus" @click="openDrawer('新增')">新增标识卡</el-button>
+        <el-button v-auth="'batchAdd'" type="primary" :icon="Upload" plain @click="batchAdd">批量添加</el-button>
+        <el-button v-auth="'export'" type="primary" :icon="Download" plain @click="downloadFile">导出数据</el-button>
         <el-button type="danger" :icon="Delete" plain :disabled="!scope.isSelected" @click="batchDelete(scope.selectedListIds)">
           批量删除标识卡
         </el-button>
@@ -23,19 +25,21 @@
       <template #operation="scope">
         <el-popover :visible="scope.row.visible" placement="top" :width="195">
           <div>
-            <el-input v-model="scope.row.printNum" style="width: 170px" placeholder="请输入需要打印的数量" />
+            <el-input v-model.number="printNum" style="width: 170px" placeholder="请输入需要打印的数量" />
             <div style="margin: 15px 0 0; text-align: right">
-              <el-button size="small" text @click="(scope.row.visible = false), (scope.row.printNum = '')">取消</el-button>
+              <el-button size="small" text @click="(scope.row.visible = false), (printNum = '')">取消</el-button>
               <el-button size="small" type="primary" @click="printPreFun(scope.row)"> 确定 </el-button>
             </div>
           </div>
           <template #reference>
-            <el-button type="primary" link :icon="Printer" @click="scope.row.visible = true">打印</el-button>
+            <el-button type="primary" v-if="!scope.row.qrBatchQty" link :icon="Printer" @click="scope.row.visible = true">
+              打印
+            </el-button>
           </template>
         </el-popover>
+        <el-button type="primary" link :icon="EditPen" @click="openDrawer('复制', scope.row)">复制</el-button>
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
-        <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', scope.row)">编辑</el-button>
-        <el-button type="primary" link :icon="Delete" @click="deleteAccount(scope.row)">删除</el-button>
+        <el-button type="primary" link :icon="Delete" @click="deleteFun(scope.row)">删除</el-button>
       </template>
     </ProTable>
     <Drawer ref="drawerRef" />
@@ -43,17 +47,26 @@
   </div>
 </template>
 
-<script setup lang="tsx" name="useProTable">
+<script setup lang="tsx" name="projectManage">
 import { ref, reactive } from "vue";
 import { Project } from "@/api/interface";
 import { useHandleData } from "@/hooks/useHandleData";
-import { ElMessage } from "element-plus";
+import { useDownload } from "@/hooks/useDownload";
+import { ElMessage, ElMessageBox } from "element-plus";
 import ProTable from "@/components/ProTable/index.vue";
 import ImportExcel from "@/components/ImportExcel/index.vue";
 import Drawer from "./components/Drawer.vue";
 import { ProTableInstance, ColumnProps } from "@/components/ProTable/interface";
-import { CirclePlus, Delete, EditPen, View, Printer } from "@element-plus/icons-vue";
-import { getProjectList, addProject, editProject, delProject } from "@/api/modules/project";
+import { CirclePlus, Delete, EditPen, View, Printer, Upload, Download } from "@element-plus/icons-vue";
+import {
+  getProjectList,
+  addProject,
+  editProject,
+  delProject,
+  exportExcelTemplate,
+  exportExcel,
+  importExcel
+} from "@/api/modules/project";
 import { findMaterialDictionaryList } from "@/api/modules/materialDic";
 import moment from "moment";
 import ExcelJS from "exceljs";
@@ -71,7 +84,6 @@ const initParam = reactive({});
 const dataCallback = (data: any) => {
   data.items.forEach((e: any) => {
     e.visible = false;
-    e.printNum = "";
   });
   return {
     list: data.items,
@@ -104,6 +116,7 @@ const columns = reactive<ColumnProps<Project.ResProjectList>[]>([
   { prop: "materialNum", label: "数量" },
   { prop: "shift", label: "班次" },
   { prop: "checker", label: "检验员" },
+  { prop: "qrBatchQty", label: "打印数量", width: 100 },
   { prop: "checkDate", label: "检验日期", width: 100 },
   { prop: "createTime", label: "创建时间", width: 180 },
   { prop: "updateTime", label: "更新时间", width: 180 },
@@ -128,7 +141,7 @@ const sortTable = ({ newIndex, oldIndex }: { newIndex?: number; oldIndex?: numbe
 };
 
 // 删除标识卡信息
-const deleteAccount = async (params: Project.ResProjectList) => {
+const deleteFun = async (params: Project.ResProjectList) => {
   await useHandleData(delProject, { ids: [params.id] }, `删除【${params.materialName}】标识卡`);
   proTable.value?.getTableList();
 };
@@ -140,6 +153,25 @@ const batchDelete = async (ids: string[]) => {
   proTable.value?.getTableList();
 };
 
+// 导出用户列表
+const downloadFile = async () => {
+  ElMessageBox.confirm("确认导出标识卡数据?", "温馨提示", { type: "warning" }).then(() =>
+    useDownload(exportExcel, "标识卡列表", proTable.value?.searchParam)
+  );
+};
+
+// 批量添加用户
+const dialogRef = ref<InstanceType<typeof ImportExcel> | null>(null);
+const batchAdd = () => {
+  const params = {
+    title: "标识卡",
+    tempApi: exportExcelTemplate,
+    importApi: importExcel,
+    getTableList: proTable.value?.getTableList
+  };
+  dialogRef.value?.acceptParams(params);
+};
+
 // 打开 drawer(新增、查看、编辑)
 const drawerRef = ref<InstanceType<typeof Drawer> | null>(null);
 const openDrawer = (title: string, row: Partial<Project.ResProjectList> = {}) => {
@@ -148,7 +180,7 @@ const openDrawer = (title: string, row: Partial<Project.ResProjectList> = {}) =>
     isView: title === "查看",
     materialDicList: materialDicList.value,
     row: { ...row },
-    api: title === "新增" ? addProject : title === "编辑" ? editProject : undefined,
+    api: title === "新增" || title === "复制" ? addProject : title === "编辑" ? editProject : undefined,
     getTableList: proTable.value?.getTableList
   };
   drawerRef.value?.acceptParams(params);
@@ -165,13 +197,15 @@ const base64ToUint8Array = (base64: string): Uint8Array => {
 };
 
 let printLoading: any = ref(false);
-
-const printPreFun = (row: any) => {
-  if (!row.printNum) {
+let printNum: any = ref();
+const printPreFun = async (row: any) => {
+  if (!printNum.value) {
     return;
   }
   row.visible = false;
   printLoading.value = true;
+  row.qrBatchQty = printNum.value;
+  await editProject(row);
   setTimeout(() => {
     printFun(row);
   }, 1000);
@@ -191,12 +225,12 @@ const printFun = async (row: any) => {
     right: { style: "medium" }
   };
   let printDate = moment(new Date()).format("YYYYMMDDHHMMSS");
-  for (let i = 0; i < row.printNum; i++) {
+  for (let i = 0; i < row.qrBatchQty; i++) {
     // 设置列宽和行高
     worksheet.getColumn(1).width = 19.5;
-    worksheet.getColumn(2).width = 20;
-    worksheet.getColumn(3).width = 20;
-    worksheet.getColumn(4).width = 20;
+    worksheet.getColumn(2).width = 28;
+    worksheet.getColumn(3).width = 28;
+    worksheet.getColumn(4).width = 28;
     worksheet.getRow(8 * i + 1).height = 162;
     worksheet.getRow(8 * i + 2).height = 80;
     worksheet.getRow(8 * i + 3).height = 80;
@@ -214,7 +248,7 @@ const printFun = async (row: any) => {
     worksheet.getRow(8 * i + 7).font = globalFontStyle;
 
     let printNo = `${printDate}-${i + 1}`;
-    let QRCodeUrl = `https://47.109.87.12/scanCode?id=${row.id}&no=${printNo}`;
+    let QRCodeUrl = `${row.id}|${printNo}`;
     let base64Image = await QRCode.toDataURL(QRCodeUrl); // 替换为你的 base64 图片数据（不包括前缀 data:image/png;base64,）
     base64Image = base64Image.replace("data:image/png;base64,", "");
     const imageArrayBuffer = base64ToUint8Array(base64Image);
@@ -257,49 +291,49 @@ const printFun = async (row: any) => {
     worksheet.getCell(`${startRow + 1}`, 1).value = "项目名称\nProject";
     worksheet.getCell(`${startRow + 1}`, 1).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 1}`, 1).border = borderStyle;
-    worksheet.getCell(`${startRow + 1}`, 2).value = "VOLVO K423";
+    worksheet.getCell(`${startRow + 1}`, 2).value = row.materialProject;
     worksheet.getCell(`${startRow + 1}`, 2).alignment = { vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 1}`, 2).border = borderStyle;
 
     worksheet.getCell(`${startRow + 1}`, 3).value = "零件名称\nDescription";
     worksheet.getCell(`${startRow + 1}`, 3).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 1}`, 3).border = borderStyle;
-    worksheet.getCell(`${startRow + 1}`, 4).value = "消音棉";
+    worksheet.getCell(`${startRow + 1}`, 4).value = row.materialName;
     worksheet.getCell(`${startRow + 1}`, 4).alignment = { vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 1}`, 4).border = borderStyle;
 
     worksheet.getCell(`${startRow + 2}`, 1).value = "件号\nPart Number";
     worksheet.getCell(`${startRow + 2}`, 1).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 2}`, 1).border = borderStyle;
-    worksheet.getCell(`${startRow + 2}`, 2).value = "82602067 GF";
+    worksheet.getCell(`${startRow + 2}`, 2).value = row.partNo;
     worksheet.getCell(`${startRow + 2}`, 2).alignment = { vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 2}`, 2).border = borderStyle;
 
     worksheet.getCell(`${startRow + 2}`, 3).value = "生产日期\nMFD.";
     worksheet.getCell(`${startRow + 2}`, 3).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 2}`, 3).border = borderStyle;
-    worksheet.getCell(`${startRow + 2}`, 4).value = "6/29/2024";
+    worksheet.getCell(`${startRow + 2}`, 4).value = row.produceDate;
     worksheet.getCell(`${startRow + 2}`, 4).alignment = { vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 2}`, 4).border = borderStyle;
 
     worksheet.getCell(`${startRow + 3}`, 1).value = "批次\nBatch NO.";
     worksheet.getCell(`${startRow + 3}`, 1).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 3}`, 1).border = borderStyle;
-    worksheet.getCell(`${startRow + 3}`, 2).value = "98";
+    worksheet.getCell(`${startRow + 3}`, 2).value = row.batchNo;
     worksheet.getCell(`${startRow + 3}`, 2).alignment = { vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 3}`, 2).border = borderStyle;
 
     worksheet.getCell(`${startRow + 3}`, 3).value = "数量\nQuantity";
     worksheet.getCell(`${startRow + 3}`, 3).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 3}`, 3).border = borderStyle;
-    worksheet.getCell(`${startRow + 3}`, 4).value = "51";
+    worksheet.getCell(`${startRow + 3}`, 4).value = row.materialNum;
     worksheet.getCell(`${startRow + 3}`, 4).alignment = { vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 3}`, 4).border = borderStyle;
 
     worksheet.getCell(`${startRow + 4}`, 1).value = "班次\nShift";
     worksheet.getCell(`${startRow + 4}`, 1).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 4}`, 1).border = borderStyle;
-    worksheet.getCell(`${startRow + 4}`, 2).value = "B";
+    worksheet.getCell(`${startRow + 4}`, 2).value = row.shift;
     worksheet.getCell(`${startRow + 4}`, 2).alignment = { vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 4}`, 2).border = borderStyle;
 
@@ -311,14 +345,14 @@ const printFun = async (row: any) => {
 
     let insDateValRange = worksheet.getCell(`${startRow + 4}`, 4).address + ":" + worksheet.getCell(`${startRow + 5}`, 4).address;
     worksheet.mergeCells(insDateValRange);
-    worksheet.getCell(insDateValRange).value = "6/29/2024";
+    worksheet.getCell(insDateValRange).value = row.checkDate;
     worksheet.getCell(insDateValRange).alignment = { vertical: "middle", horizontal: "center" };
     worksheet.getCell(insDateValRange).border = borderStyle;
 
     worksheet.getCell(`${startRow + 5}`, 1).value = "检验员\nInspector";
     worksheet.getCell(`${startRow + 5}`, 1).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 5}`, 1).border = borderStyle;
-    worksheet.getCell(`${startRow + 5}`, 2).value = "叶维政";
+    worksheet.getCell(`${startRow + 5}`, 2).value = row.checker;
     worksheet.getCell(`${startRow + 5}`, 2).alignment = { vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 5}`, 2).border = borderStyle;
 
@@ -335,8 +369,8 @@ const printFun = async (row: any) => {
   // 导出 Excel 文件
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-  saveAs(blob, "output.xlsx");
+  saveAs(blob, `标识卡打印${moment(new Date()).format("YYYY-MM-DD-HH-MM-SS")}.xlsx`);
   printLoading.value = false;
-  row.printNum = "";
+  printNum.value = "";
 };
 </script>
