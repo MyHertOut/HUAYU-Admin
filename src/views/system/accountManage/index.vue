@@ -41,6 +41,7 @@
           <template #operation="scope">
             <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
             <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', scope.row)">编辑</el-button>
+            <el-button type="primary" link :icon="Refresh" @click="resetPass(scope.row)">重置密码</el-button>
             <el-button type="primary" link :icon="Delete" @click="deleteFun(scope.row)">删除</el-button>
           </template>
         </ProTable>
@@ -61,10 +62,11 @@ import RoleFilter from "@/components/RoleFilter/index.vue";
 import ImportExcel from "@/components/ImportExcel/index.vue";
 import Drawer from "./components/Drawer.vue";
 import { ProTableInstance, ColumnProps } from "@/components/ProTable/interface";
-import { CirclePlus, Delete, EditPen, View } from "@element-plus/icons-vue";
-import { getUserList, delUser, editUser, addUser } from "@/api/modules/user";
+import { CirclePlus, Delete, EditPen, View, Refresh } from "@element-plus/icons-vue";
+import { getUserList, delUser, editUser, addUser, updatePassword } from "@/api/modules/user";
 import { findRoleList } from "@/api/modules/role";
 import moment from "moment";
+import md5 from "md5";
 
 // ProTable 实例
 const proTable = ref<ProTableInstance>();
@@ -142,7 +144,7 @@ const columns = reactive<ColumnProps<User.ResUserList>[]>([
     label: "更新时间",
     width: 180
   },
-  { prop: "operation", label: "操作", fixed: "right", width: 210 }
+  { prop: "operation", label: "操作", fixed: "right", width: 320 }
 ]);
 
 const roleList: any = ref([]);
@@ -181,6 +183,11 @@ const deleteFun = async (params: User.ResUserList) => {
 const batchDelete = async (ids: string[]) => {
   await useHandleData(delUser, { ids }, "删除所选用户信息");
   proTable.value?.clearSelection();
+  proTable.value?.getTableList();
+};
+
+const resetPass = async (params: any) => {
+  await useHandleData(updatePassword, { userId: params.id, password: md5("123456") }, `重置【${params.username}】用户密码`);
   proTable.value?.getTableList();
 };
 

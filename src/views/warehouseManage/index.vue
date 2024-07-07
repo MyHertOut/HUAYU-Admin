@@ -107,7 +107,7 @@ GetUserList();
 const dealName = val => {
   let text = "";
   JSON.parse(val).forEach(id => {
-    let item = userList.value.filter(e => e.id === id)[0];
+    let item = userList.value.filter(e => e.id == id[0])[0];
     text += `${item.username}(${item.phoneNum}) `;
   });
   return text;

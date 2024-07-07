@@ -26,8 +26,8 @@ export const exportExcelTemplate = () => {
   return http.download(PORT4 + `/material/exportExcelTemplate`);
 };
 
-export const exportExcel = () => {
-  return http.get(PORT4 + `/material/exportExcel`);
+export const exportExcel = params => {
+  return http.download(PORT4 + `/material/exportExcel`, params);
 };
 
 export const importExcel = (params: FormData) => {

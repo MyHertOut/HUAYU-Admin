@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, nextTick } from "vue";
 import { useRouter } from "vue-router";
 // import { HOME_URL } from "@/config";
 import { getTimeState } from "@/utils";
@@ -84,8 +84,11 @@ const login = (formEl: FormInstance | undefined) => {
       keepAliveStore.setKeepAliveName([]);
 
       // 4.跳转到首页
-      let firstPath = authMenuListGet[0].path;
-      router.push(firstPath);
+
+      nextTick(() => {
+        let firstPath = authMenuListGet[0].path;
+        router.push(firstPath);
+      });
       ElNotification({
         title: getTimeState(),
         message: "欢迎登录 华裕科技仓储管理系统",

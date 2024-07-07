@@ -10,6 +10,7 @@
     >
       <!-- 表格 header 按钮 -->
       <template #tableHeader="scope">
+        <el-button type="primary" :icon="Download" plain @click="downloadFile">导出数据</el-button>
         <el-button
           type="danger"
           v-if="false"
@@ -36,13 +37,14 @@
 <script setup lang="tsx" name="warehousing">
 import { ref, reactive } from "vue";
 import { useHandleData } from "@/hooks/useHandleData";
-import { ElMessage } from "element-plus";
+import { useDownload } from "@/hooks/useDownload";
+import { ElMessage, ElMessageBox } from "element-plus";
 import ProTable from "@/components/ProTable/index.vue";
 import ImportExcel from "@/components/ImportExcel/index.vue";
 import Drawer from "./components/Drawer.vue";
 import { ProTableInstance, ColumnProps } from "@/components/ProTable/interface";
-import { Delete, View } from "@element-plus/icons-vue";
-import { getDepotRecordList, delDepotRecord } from "@/api/modules/depotRecord";
+import { Delete, View, Download } from "@element-plus/icons-vue";
+import { getDepotRecordList, delDepotRecord, exportDepotRecord } from "@/api/modules/depotRecord";
 import moment from "moment";
 
 // ProTable 实例
@@ -75,12 +77,13 @@ const getTableList = (params: any) => {
 // 页面按钮权限（按钮权限既可以使用 hooks，也可以直接使用 v-auth 指令，指令适合直接绑定在按钮上，hooks 适合根据按钮权限显示不同的内容）
 
 // 表格配置项
+// sourceDepotId/targetDepotId/materialId/qrBatchNo/qrSerialNo/operateType/materialIds/depotOwner/partNo/operatorId/depotName/depotId/materialName/materialProject/materialBelongTo
 const columns = reactive<ColumnProps<any>[]>([
   { type: "selection", fixed: "left", width: 70 },
-  { prop: "partNo", label: "件号", search: { el: "input" }, width: 180 },
+  { prop: "partNo", label: "件号", search: { el: "input" }, width: 120 },
   { prop: "qrSerialNo", label: "编号" },
-  { prop: "materialName", label: "零件名称" },
-  { prop: "targetDepotName", label: "入库仓库" },
+  { prop: "materialName", label: "零件名称", search: { el: "input" }, width: 120 },
+  { prop: "targetDepotName", label: "入库仓库", search: { el: "input" }, width: 120 },
   { prop: "targetLocationNo", label: "入库库位" },
   { prop: "createTime", label: "入库时间", width: 180 },
   { prop: "operatorName", label: "入库人", width: 180 },
@@ -92,6 +95,12 @@ const sortTable = ({ newIndex, oldIndex }: { newIndex?: number; oldIndex?: numbe
   console.log(newIndex, oldIndex);
   console.log(proTable.value?.tableData);
   ElMessage.success("修改列表排序成功");
+};
+
+const downloadFile = async () => {
+  ElMessageBox.confirm("确认导出数据?", "温馨提示", { type: "warning" }).then(() =>
+    useDownload(exportDepotRecord, "入库记录列表", proTable.value?.searchParam)
+  );
 };
 
 // 删除记录

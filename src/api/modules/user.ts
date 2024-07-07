@@ -24,3 +24,7 @@ export const delUser = (params: { ids: number[] }) => {
 export const findUserList = () => {
   return http.post<ResPage<User.ResUserList>>(PORT4 + `/user/findUserList`, {}, { loading: false });
 };
+
+export const updatePassword = params => {
+  return http.post(PORT4 + `/user/updatePassword`, params);
+};

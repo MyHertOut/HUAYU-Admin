@@ -86,6 +86,9 @@ importers:
       vue-i18n:
         specifier: ^9.10.1
         version: 9.10.1(vue@3.4.21(typescript@5.3.3))
+      vue-masonry-css:
+        specifier: ^1.0.3
+        version: 1.0.3
       vue-qrcode-reader:
         specifier: ^5.5.6
         version: 5.5.6
@@ -5031,6 +5034,9 @@ packages:
     engines: {node: '>= 16'}
     peerDependencies:
       vue: ^3.0.0
+
+  vue-masonry-css@1.0.3:
+    resolution: {integrity: sha512-viecHQiHVLez7HlYUQsv1wJb2MT/RDSzkDp6m3In41vPrk6OsBmT2qRE8LZqYIA4daIwrnx/Xm8h4fjOpuE3hw==, tarball: https://r2.cnpmjs.org/vue-masonry-css/-/vue-masonry-css-1.0.3.tgz}
 
   vue-qrcode-reader@5.5.6:
     resolution: {integrity: sha512-aKEm0OHVO4aj2VZSZPua0nJytSHqqAnnVlH5a6OBXhq9644NuQ4UAHXhXKbkmzJXN+9LuKhX2+C8SHNV8RXCjg==}
@@ -10507,6 +10513,8 @@ snapshots:
       '@intlify/shared': 9.10.1
       '@vue/devtools-api': 6.6.1
       vue: 3.4.21(typescript@5.3.3)
+
+  vue-masonry-css@1.0.3: {}
 
   vue-qrcode-reader@5.5.6:
     dependencies:

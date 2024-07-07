@@ -121,13 +121,12 @@ const handleSubmit = () => {
       rolesArr.forEach((el: any) => {
         arr.push(JSON.parse(el));
       });
-      drawerProps.value.row.roles = arr;
       if (drawerProps.value.title === "新增") {
-        drawerProps.value.row.password = md5(drawerProps.value.row.phoneNum);
+        drawerProps.value.row.password = md5("123456");
       }
       delete drawerProps.value.row.createTime;
       delete drawerProps.value.row.updateTime;
-      await drawerProps.value.api!(drawerProps.value.row);
+      await drawerProps.value.api!({ ...drawerProps.value.row, roles: arr });
       ElMessage.success({ message: `${drawerProps.value.title}用户成功！` });
       drawerProps.value.getTableList!();
       drawerVisible.value = false;

@@ -69,7 +69,7 @@ const getResponsive = (item: ColumnProps) => {
 };
 
 // 是否默认折叠搜索项
-const collapsed = ref(true);
+const collapsed = ref(false);
 
 // 获取响应式断点
 const gridRef = ref();

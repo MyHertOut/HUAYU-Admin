@@ -9,7 +9,7 @@
         <el-dropdown-item v-if="false" @click="openDialog('infoRef')">
           <el-icon><User /></el-icon>{{ $t("header.personalData") }}
         </el-dropdown-item>
-        <el-dropdown-item v-if="false" @click="openDialog('passwordRef')">
+        <el-dropdown-item @click="openDialog('passwordRef')">
           <el-icon><Edit /></el-icon>{{ $t("header.changePassword") }}
         </el-dropdown-item>
         <!-- divided -->

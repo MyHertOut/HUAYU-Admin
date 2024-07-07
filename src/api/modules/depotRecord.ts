@@ -23,3 +23,11 @@ export const delDepotRecord = (params: { ids: number[] }) => {
 export const depotStatistics = (params: any) => {
   return http.post(PORT4 + `/depotRecord/depotStatistics`, params);
 };
+
+export const depotStorageStatistics = () => {
+  return http.get(PORT4 + `/depotRecord/depotStorageStatistics`, {}, { loading: false });
+};
+
+export const exportDepotRecord = params => {
+  return http.download(PORT4 + `/depotRecord/exportDepotRecord`, params);
+};

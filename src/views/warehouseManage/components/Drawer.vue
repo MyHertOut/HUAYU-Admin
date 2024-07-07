@@ -10,7 +10,12 @@
       :hide-required-asterisk="drawerProps.isView"
     >
       <el-form-item label="名称" prop="depotName">
-        <el-input v-model="drawerProps.row!.depotName" placeholder="请输入仓库名称" clearable></el-input>
+        <el-input
+          v-model="drawerProps.row!.depotName"
+          placeholder="请输入仓库名称"
+          clearable
+          :disabled="drawerProps.title !== '新增'"
+        ></el-input>
       </el-form-item>
       <el-form-item label="编号" prop="depotNo">
         <el-input v-model="drawerProps.row!.depotNo" placeholder="请输入仓库编号" clearable></el-input>
@@ -27,6 +32,7 @@
       <el-form-item label="负责人" prop="depotOwner">
         <el-select
           v-model="drawerProps.row!.depotOwner"
+          :disabled="drawerProps.title !== '新增'"
           filterable
           default-first-option
           placeholder="请输入仓库负责人"
@@ -84,7 +90,11 @@ const acceptParams = (params: DrawerProps) => {
   drawerProps.value = params;
   drawerVisible.value = true;
   if (drawerProps.value.title !== "新增") {
-    drawerProps.value.row.depotOwner = JSON.parse(drawerProps.value.row.depotOwner);
+    let arr = JSON.parse(drawerProps.value.row.depotOwner);
+    drawerProps.value.row.depotOwner = [];
+    arr.forEach(e => {
+      drawerProps.value.row.depotOwner.push(Number(e[0]));
+    });
   }
 };
 
@@ -94,8 +104,11 @@ const handleSubmit = () => {
   ruleFormRef.value!.validate(async valid => {
     if (!valid) return;
     try {
-      drawerProps.value.row.depotOwner = JSON.stringify(drawerProps.value.row.depotOwner);
-      await drawerProps.value.api!(drawerProps.value.row);
+      let arr: any = [];
+      drawerProps.value.row.depotOwner.forEach((e: any) => {
+        arr.push([e]);
+      });
+      await drawerProps.value.api!({ ...drawerProps.value.row, depotOwner: JSON.stringify(arr) });
       ElMessage.success({ message: `${drawerProps.value.title}仓库成功！` });
       drawerProps.value.getTableList!();
       drawerVisible.value = false;
