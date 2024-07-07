@@ -6,10 +6,11 @@
         v-for="(v, k) in list"
         :key="k"
       >
-        <el-statistic :title="v.depotName" :value="v.totalCount" />
+        <el-statistic :title="`${v.depotName}${v.isDelete ? '（已删除）' : ''}`" :value="v.totalCount" />
 
-        <div style="padding: 0 10px 10px">库存明细</div>
+        <!-- <div style="padding: 0 10px 10px" v-if="v.totalCount">库存明细</div> -->
         <div
+          v-if="v.totalCount"
           style="
             box-sizing: border-box;
             display: flex;
@@ -23,6 +24,19 @@
             <span>{{ vl.materialName }}：</span>
             <span>{{ vl.totalCount }}</span>
           </div>
+        </div>
+        <div
+          v-else
+          style="
+            box-sizing: border-box;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 10px 10px;
+          "
+        >
+          暂无库存
         </div>
       </div>
     </div>
