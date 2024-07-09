@@ -1,5 +1,9 @@
 <template>
-  <el-dropdown trigger="click">
+  <div style="display: flex; font-size: 15px; color: var(--el-header-text-color)">
+    <div style="margin-right: 20px; cursor: pointer" @click="openDialog('passwordRef')">{{ $t("header.changePassword") }}</div>
+    <div style="cursor: pointer" @click="logout">{{ $t("header.logout") }}</div>
+  </div>
+  <el-dropdown trigger="click" v-if="false">
     <div class="avatar">
       <img v-if="!headerImage" src="@/assets/images/avatar.gif" alt="avatar" />
       <img v-else :src="headerImage" alt="avatar" />

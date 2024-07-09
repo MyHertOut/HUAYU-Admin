@@ -9,7 +9,7 @@
       :model="drawerProps.row"
       :hide-required-asterisk="drawerProps.isView"
     >
-      <el-form-item label="用户头像" prop="headerImage">
+      <el-form-item label="用户头像" prop="headerImage" v-if="false">
         <UploadImg v-model:image-url="drawerProps.row!.headerImage" width="135px" height="135px" :file-size="3">
           <template #empty>
             <el-icon><Avatar /></el-icon>
@@ -67,7 +67,6 @@ import UploadImg from "@/components/Upload/Img.vue";
 import md5 from "md5";
 
 const rules = reactive({
-  headerImage: [{ required: true, message: "请上传用户头像" }],
   username: [{ required: true, message: "请填写用户姓名" }],
   loginName: [{ required: true, message: "请填写登录名" }],
   phoneNum: [{ required: true, message: "请填写用户手机号" }],
