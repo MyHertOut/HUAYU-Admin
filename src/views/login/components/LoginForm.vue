@@ -1,7 +1,7 @@
 <template>
   <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" size="large">
     <el-form-item prop="username">
-      <el-input v-model="loginForm.username" placeholder="请输入手机号">
+      <el-input v-model="loginForm.username" placeholder="请输入登录名">
         <template #prefix>
           <el-icon class="el-input__icon">
             <user />
@@ -52,7 +52,7 @@ const keepAliveStore = useKeepAliveStore();
 type FormInstance = InstanceType<typeof ElForm>;
 const loginFormRef = ref<FormInstance>();
 const loginRules = reactive({
-  username: [{ required: true, message: "请输入手机号", trigger: "blur" }],
+  username: [{ required: true, message: "请输入登录名", trigger: "blur" }],
   password: [{ required: true, message: "请输入密码", trigger: "blur" }]
 });
 

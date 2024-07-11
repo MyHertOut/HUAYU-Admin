@@ -23,12 +23,12 @@
       <el-form-item label="类型" prop="depotTypeName">
         <el-input v-model="drawerProps.row!.depotTypeName" placeholder="请输入仓库类型" clearable></el-input>
       </el-form-item>
-      <el-form-item label="地址" prop="depotAddress">
+      <!-- <el-form-item label="地址" prop="depotAddress">
         <el-input v-model="drawerProps.row!.depotAddress" placeholder="请输入仓库地址" clearable></el-input>
       </el-form-item>
       <el-form-item label="区域" prop="depotArea">
         <el-input v-model="drawerProps.row!.depotArea" placeholder="请输入仓库区域" clearable></el-input>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="负责人" prop="depotOwner">
         <el-select
           v-model="drawerProps.row!.depotOwner"
@@ -64,8 +64,8 @@ const rules = reactive({
   depotName: [{ required: true, message: "请输入仓库名称" }],
   depotNo: [{ required: true, message: "请输入仓库编号" }],
   depotTypeName: [{ required: true, message: "请输入仓库类型" }],
-  depotAddress: [{ required: true, message: "请输入仓库地址" }],
-  depotArea: [{ required: true, message: "请输入仓库区域" }],
+  // depotAddress: [{ required: true, message: "请输入仓库地址" }],
+  // depotArea: [{ required: true, message: "请输入仓库区域" }],
   depotOwner: [{ required: true, message: "请输入仓库负责人" }]
 });
 

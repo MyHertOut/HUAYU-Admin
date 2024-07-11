@@ -79,8 +79,8 @@ const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
   { prop: "depotName", label: "名称", search: { el: "input", key: "name" } },
   { prop: "depotNo", label: "编号" },
   { prop: "depotTypeName", label: "类型" },
-  { prop: "depotAddress", label: "地址" },
-  { prop: "depotArea", label: "区域" },
+  // { prop: "depotAddress", label: "地址" },
+  // { prop: "depotArea", label: "区域" },
   {
     prop: "depotOwner",
     label: "负责人",

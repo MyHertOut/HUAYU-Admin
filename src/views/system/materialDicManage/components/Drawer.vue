@@ -18,13 +18,13 @@
       <el-form-item label="项目名称" prop="projectName">
         <el-input v-model="drawerProps.row!.projectName" placeholder="请填写项目名称" clearable></el-input>
       </el-form-item>
-      <el-form-item label="预留字段1" prop="reservedAttr1">
-        <el-input v-model="drawerProps.row!.reservedAttr1" placeholder="请填写预留字段1" clearable></el-input>
+      <el-form-item label="规格型号" prop="reservedAttr1">
+        <el-input v-model="drawerProps.row!.reservedAttr1" placeholder="请填写规格型号" clearable></el-input>
       </el-form-item>
-      <el-form-item label="预留字段2" prop="reservedAttr2">
-        <el-input v-model="drawerProps.row!.reservedAttr2" placeholder="请填写预留字段2" clearable></el-input>
+      <el-form-item label="U8存货编码" prop="reservedAttr2">
+        <el-input v-model="drawerProps.row!.reservedAttr2" placeholder="请填写U8存货编码" clearable></el-input>
       </el-form-item>
-      <el-form-item label="预留字段3" prop="reservedAttr3">
+      <el-form-item v-if="false" label="预留字段3" prop="reservedAttr3">
         <el-input v-model="drawerProps.row!.reservedAttr3" placeholder="请填写预留字段3" clearable></el-input>
       </el-form-item>
     </el-form>

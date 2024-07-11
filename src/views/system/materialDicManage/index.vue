@@ -81,9 +81,8 @@ const columns = reactive<ColumnProps<MaterialDic.ResMaterialDicList>[]>([
   { prop: "partNo", label: "零件号", search: { el: "input" }, width: 180 },
   { prop: "materialName", label: "零件名称", search: { el: "input" }, width: 180 },
   { prop: "projectName", label: "项目名称", search: { el: "input" }, width: 180 },
-  { prop: "reservedAttr1", label: "预留字段1", width: 180 },
-  { prop: "reservedAttr2", label: "预留字段2", width: 180 },
-  { prop: "reservedAttr3", label: "预留字段3", width: 180 },
+  { prop: "reservedAttr1", label: "规格型号", width: 180 },
+  { prop: "reservedAttr2", label: "U8存货编码", width: 180 },
   { prop: "createTime", label: "创建时间", width: 180 },
   { prop: "updateTime", label: "更新时间", width: 180 },
   { prop: "operation", label: "操作", fixed: "right", width: 220 }
