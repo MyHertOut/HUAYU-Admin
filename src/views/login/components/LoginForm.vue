@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, nextTick } from "vue";
+import { ref, reactive, onMounted, nextTick, computed } from "vue";
 import { useRouter } from "vue-router";
 // import { HOME_URL } from "@/config";
 import { getTimeState } from "@/utils";
@@ -48,6 +48,10 @@ const router = useRouter();
 const userStore = useUserStore();
 const tabsStore = useTabsStore();
 const keepAliveStore = useKeepAliveStore();
+
+const isMobile = computed(() => {
+  return window.screen.width < 450;
+});
 
 type FormInstance = InstanceType<typeof ElForm>;
 const loginFormRef = ref<FormInstance>();
@@ -86,8 +90,16 @@ const login = (formEl: FormInstance | undefined) => {
       // 4.跳转到首页
 
       nextTick(() => {
-        let firstPath = authMenuListGet[0].path;
-        router.push(firstPath);
+        if (isMobile.value) {
+          let index = authMenuListGet.findIndex((e: any) => e.path === "/scanCode");
+          if (index !== -1) {
+            let firstPath = authMenuListGet[index].path;
+            router.push(firstPath);
+          }
+        } else {
+          let firstPath = authMenuListGet[0].path;
+          router.push(firstPath);
+        }
       });
       ElNotification({
         title: getTimeState(),
