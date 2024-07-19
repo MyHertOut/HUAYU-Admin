@@ -23,6 +23,7 @@
 <script setup lang="tsx" name="warehouseManage">
 import { ref, reactive } from "vue";
 import { Depot } from "@/api/interface";
+import { useRoute } from "vue-router";
 import { useDownload } from "@/hooks/useDownload";
 import { ElMessage, ElMessageBox } from "element-plus";
 import ProTable from "@/components/ProTable/index.vue";
@@ -33,11 +34,13 @@ import { findDepotStorages, exportDepotStorage } from "@/api/modules/depot";
 import { findUserList } from "@/api/modules/user";
 import moment from "moment";
 
+const route = useRoute();
+
 // ProTable 实例
 const proTable = ref<ProTableInstance>();
 
 // 如果表格需要初始化请求参数，直接定义传给 ProTable (之后每次请求都会自动带上该参数，此参数更改之后也会一直带上，改变此参数会自动刷新表格数据)
-const initParam = reactive({});
+const initParam = reactive({ depotLocationId: Number(route.query?.depotLocationId) });
 
 // dataCallback 是对于返回的表格数据做处理，如果你后台返回的数据不是 list && total && pageNo && pageSize 这些字段，可以在这里进行处理成这些字段
 // 或者直接去 hooks/useTable.ts 文件中把字段改为你后端对应的就行
@@ -65,11 +68,10 @@ const getTableList = (params: any) => {
 // 表格配置项
 const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
   { type: "selection", fixed: "left", width: 70 },
-  { prop: "depotName", label: "仓库名称", search: { el: "input", key: "name" } },
-  { prop: "depotNo", label: "编号" },
-  { prop: "depotTypeName", label: "类型" },
-  // { prop: "depotAddress", label: "地址" },
-  // { prop: "depotArea", label: "区域" },
+  { prop: "materialName", label: "标识卡名称", search: { el: "input" } },
+  { prop: "qrSerialNo", label: "标识卡编号", search: { el: "input" } },
+  { prop: "depotName", label: "所在仓库", search: { el: "input" } },
+  { prop: "depotLocationNo", label: "所在库位", search: { el: "input" } },
   {
     prop: "depotOwner",
     label: "负责人",
@@ -78,8 +80,8 @@ const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
     },
     width: 300
   },
-  { prop: "createTime", label: "创建时间", width: 180 },
-  { prop: "operation", label: "操作", fixed: "right", width: 220 }
+  { prop: "createTime", label: "创建时间", width: 180 }
+  // { prop: "operation", label: "操作", fixed: "right", width: 220 }
 ]);
 
 const userList: any = ref([]);
@@ -111,7 +113,7 @@ const sortTable = ({ newIndex, oldIndex }: { newIndex?: number; oldIndex?: numbe
 
 const downloadFile = async () => {
   ElMessageBox.confirm("确认导出数据?", "温馨提示", { type: "warning" }).then(() =>
-    useDownload(exportDepotStorage, "出库记录列表", proTable.value?.searchParam)
+    useDownload(exportDepotStorage, "库存列表", proTable.value?.searchParam)
   );
 };
 </script>

@@ -112,7 +112,8 @@ export namespace Project {
     updateTime: string;
     remark: string;
     deleteFlag: number;
-    qrBatchQty: number;
+    qrBatchQty: any;
+    qrBatchNo: any;
     materialBelongTo: string;
   }
 }

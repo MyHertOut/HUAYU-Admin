@@ -49,7 +49,7 @@ watch(
     tabsMenuValue.value = route.fullPath;
     const tabsParams = {
       icon: route.meta.icon as string,
-      title: route.meta.title as string,
+      title: route.query.tabTitle ? (route.query.tabTitle as string) : (route.meta.title as string),
       path: route.fullPath,
       name: route.name as string,
       close: !route.meta.isAffix,

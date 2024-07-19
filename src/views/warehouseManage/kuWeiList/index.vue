@@ -9,35 +9,47 @@
       @darg-sort="sortTable"
     >
       <!-- 表格 header 按钮 -->
-      <template #tableHeader="">
-        <el-button type="primary" :icon="Download" plain @click="downloadFile">导出数据</el-button>
+      <template #tableHeader="scope">
+        <el-button type="danger" :icon="Delete" plain :disabled="!scope.isSelected" @click="batchDelete(scope.selectedListIds)">
+          批量删除库位
+        </el-button>
       </template>
       <template #produceDate="scope"> {{ moment(scope.row.produceDate).format("M/D/YYYY") }} </template>
       <template #checkDate="scope"> {{ moment(scope.row.checkDate).format("M/D/YYYY") }} </template>
       <template #createTime="scope"> {{ moment(scope.row.createTime).format("YYYY-MM-DD hh:mm:ss") }} </template>
+      <!-- 表格操作 -->
+      <template #operation="scope">
+        <el-button type="primary" link :icon="View" @click="openKuCun(scope.row)">查看库存明细</el-button>
+        <el-button type="primary" link :icon="Delete" @click="deleteFun(scope.row)">删除</el-button>
+      </template>
     </ProTable>
+    <Drawer ref="drawerRef" />
     <ImportExcel ref="dialogRef" />
   </div>
 </template>
 
-<script setup lang="tsx" name="warehouseManage">
+<script setup lang="tsx" name="warehouseManageDetails">
 import { ref, reactive } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { Depot } from "@/api/interface";
-import { useDownload } from "@/hooks/useDownload";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { useHandleData } from "@/hooks/useHandleData";
+import { ElMessage } from "element-plus";
 import ProTable from "@/components/ProTable/index.vue";
 import ImportExcel from "@/components/ImportExcel/index.vue";
+import Drawer from "./components/Drawer.vue";
 import { ProTableInstance, ColumnProps } from "@/components/ProTable/interface";
-import { Download } from "@element-plus/icons-vue";
-import { findDepotStorages, exportDepotStorage } from "@/api/modules/depot";
+import { Delete, View } from "@element-plus/icons-vue";
+import { getDepotLocation, delDepotLocation } from "@/api/modules/depot";
 import { findUserList } from "@/api/modules/user";
 import moment from "moment";
+
+const route = useRoute();
 
 // ProTable 实例
 const proTable = ref<ProTableInstance>();
 
 // 如果表格需要初始化请求参数，直接定义传给 ProTable (之后每次请求都会自动带上该参数，此参数更改之后也会一直带上，改变此参数会自动刷新表格数据)
-const initParam = reactive({});
+const initParam = reactive({ depotId: Number(route.query?.depotId) });
 
 // dataCallback 是对于返回的表格数据做处理，如果你后台返回的数据不是 list && total && pageNo && pageSize 这些字段，可以在这里进行处理成这些字段
 // 或者直接去 hooks/useTable.ts 文件中把字段改为你后端对应的就行
@@ -51,13 +63,13 @@ const dataCallback = (data: any) => {
 };
 
 // 如果你想在请求之前对当前请求参数做一些操作，可以自定义如下函数：params 为当前所有的请求参数（包括分页），最后返回请求列表接口
-// 默认不做操作就直接在 ProTable 组件上绑定	:requestApi="findDepotStorages"
+// 默认不做操作就直接在 ProTable 组件上绑定	:requestApi="getDepotLocation"
 const getTableList = (params: any) => {
   let newParams = JSON.parse(JSON.stringify(params));
   newParams.createTime && (newParams.startTime = newParams.createTime[0]);
   newParams.createTime && (newParams.endTime = newParams.createTime[1]);
   delete newParams.createTime;
-  return findDepotStorages(newParams);
+  return getDepotLocation(newParams);
 };
 
 // 页面按钮权限（按钮权限既可以使用 hooks，也可以直接使用 v-auth 指令，指令适合直接绑定在按钮上，hooks 适合根据按钮权限显示不同的内容）
@@ -65,14 +77,13 @@ const getTableList = (params: any) => {
 // 表格配置项
 const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
   { type: "selection", fixed: "left", width: 70 },
-  { prop: "depotName", label: "仓库名称", search: { el: "input", key: "name" } },
-  { prop: "depotNo", label: "编号" },
-  { prop: "depotTypeName", label: "类型" },
-  // { prop: "depotAddress", label: "地址" },
-  // { prop: "depotArea", label: "区域" },
+  { prop: "locationNo", label: "库位名称", search: { el: "input" } },
+  { prop: "locationDesc", label: "库位描述" },
+  { prop: "locationStorage", label: "库位库存" },
+  { prop: "depotName", label: "所属仓库", search: { el: "input" } },
   {
     prop: "depotOwner",
-    label: "负责人",
+    label: "仓库负责人",
     render: scope => {
       return <>{dealName(scope.row.depotOwner)}</>;
     },
@@ -109,9 +120,27 @@ const sortTable = ({ newIndex, oldIndex }: { newIndex?: number; oldIndex?: numbe
   ElMessage.success("修改列表排序成功");
 };
 
-const downloadFile = async () => {
-  ElMessageBox.confirm("确认导出数据?", "温馨提示", { type: "warning" }).then(() =>
-    useDownload(exportDepotStorage, "出库记录列表", proTable.value?.searchParam)
-  );
+// 删除库位
+const deleteFun = async (params: Depot.ResDepotList) => {
+  await useHandleData(delDepotLocation, { ids: [params.id] }, `删除【${params.depotName}】库位`);
+  proTable.value?.getTableList();
+};
+
+// 批量删除库位
+const batchDelete = async (ids: string[]) => {
+  await useHandleData(delDepotLocation, { ids }, "删除所选库位");
+  proTable.value?.clearSelection();
+  proTable.value?.getTableList();
+};
+
+const router = useRouter();
+const openKuCun = (row: any) => {
+  router.push({
+    path: "/warehouseManage/kuCunList",
+    query: {
+      depotLocationId: row.id,
+      tabTitle: row.depotName + "-" + row.locationNo
+    }
+  });
 };
 </script>

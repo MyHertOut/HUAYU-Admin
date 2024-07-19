@@ -5,47 +5,41 @@
       <el-form-item label="操作类型" prop="operateType">
         <el-radio-group v-model="params.operateType">
           <el-radio :value="1" size="default">入库</el-radio>
-          <el-radio :value="2" size="default">出库</el-radio>
           <el-radio :value="3" size="default">转库</el-radio>
+          <el-radio :value="2" size="default">出库</el-radio>
         </el-radio-group>
       </el-form-item>
 
-      <div style="padding: 10px; background: #efefef">
-        <el-form-item label="源仓库" prop="sourceDepotId" v-if="params.operateType === 2 || params.operateType === 3">
-          <el-select v-model="params.sourceDepotId" filterable default-first-option placeholder="请选择源仓库" clearable>
+      <div style="padding: 10px; background: #efefef" v-if="params.operateType === 1 || params.operateType === 3">
+        <el-form-item label="仓库" prop="depotId">
+          <el-select v-model="params.depotId" filterable default-first-option placeholder="请选择仓库" clearable>
             <el-option v-for="(item, key) in depotList" :key="key" :label="item.depotName" :value="item.id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="源仓-库位号" prop="sourceLocationNo" v-if="params.operateType === 2 || params.operateType === 3">
-          <el-input v-model="params.sourceLocationNo" placeholder="请输入源仓-库位号" clearable></el-input>
-        </el-form-item>
-        <el-form-item
-          label="源仓-库位描述"
-          prop="sourceLocationDescribe"
-          v-if="params.operateType === 2 || params.operateType === 3"
-        >
-          <el-input v-model="params.sourceLocationDescribe" placeholder="请输入源仓-库位描述" clearable></el-input>
-        </el-form-item>
-      </div>
-
-      <div style="padding: 10px; background: #efefef">
-        <el-form-item label="目标仓库" prop="targetDepotId" v-if="params.operateType === 1 || params.operateType === 3">
-          <el-select v-model="params.targetDepotId" filterable default-first-option placeholder="请选择目标仓库" clearable>
-            <el-option v-for="(item, key) in depotList" :key="key" :label="item.depotName" :value="item.id" />
+        <el-form-item label="库位号" prop="depotLocationId">
+          <el-select
+            v-model="params.depotLocationId"
+            filterable
+            allow-create
+            default-first-option
+            :reserve-keyword="false"
+            placeholder="输入查询，未找到的亦可创建"
+            clearable
+          >
+            <el-option v-for="(item, key) in depotLocationList" :key="key" :label="item.partNo" :value="item.partNo" />
           </el-select>
         </el-form-item>
-        <el-form-item label="目标仓-库位号" prop="targetLocationNo" v-if="params.operateType === 1 || params.operateType === 3">
-          <el-input v-model="params.targetLocationNo" placeholder="请输入目标仓-库位号" clearable></el-input>
-        </el-form-item>
-        <el-form-item
-          label="目标仓-库位描述"
-          prop="targetLocationDescribe"
-          v-if="params.operateType === 1 || params.operateType === 3"
-        >
-          <el-input v-model="params.targetLocationDescribe" placeholder="请输入目标仓-库位描述" clearable></el-input>
+        <el-form-item label="库位描述" prop="depotLocationDesc" v-if="!isDepotLocationIdHave">
+          <el-input
+            :disabled="isDepotLocationIdHave"
+            v-model="params.depotLocationDesc"
+            placeholder="请输入库位描述"
+            clearable
+          ></el-input>
         </el-form-item>
       </div>
     </el-form>
+
     <el-button style="margin-top: 20px" v-if="!isStart" type="primary" @click="startScan">开始扫描</el-button>
     <div class="content-box">
       <video ref="video" class="videoBox" autoplay v-show="isStart"></video>
@@ -59,28 +53,27 @@
 </template>
 
 <script setup lang="ts" name="scanCode">
-import { onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
 import { ElMessage, FormInstance } from "element-plus";
 import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
-import { findDepotList } from "@/api/modules/depot";
+import { findDepotList, findDepotLocationList } from "@/api/modules/depot";
 import { addDepotRecord } from "@/api/modules/depotRecord";
 
 const params: any = ref({
-  operateType: 1,
-  sourceDepotId: null,
-  sourceLocationNo: null,
-  sourceLocationDescribe: "",
-  targetDepotId: null,
-  targetLocationNo: null,
-  targetLocationDescribe: "",
+  depotId: null,
+  depotLocationDesc: "",
+  depotLocationId: null,
+  depotLocationNo: "",
   materialId: null,
+  operateType: 1,
   qrSerialNo: ""
 });
 
 const rules = reactive({
   operateType: [{ required: true, message: "请选择操作类型" }],
-  sourceDepotId: [{ required: true, message: "请选择源仓库" }],
-  targetDepotId: [{ required: true, message: "请选择目标仓库" }]
+  depotId: [{ required: true, message: "请选择仓库" }],
+  depotLocationId: [{ required: true, message: "请选择或创建库位" }]
+  // depotLocationDesc: [{ required: true, message: "请输入库位描述" }]
 });
 
 const depotList: any = ref([]);
@@ -92,13 +85,34 @@ const GetDepotList = async () => {
   }
 };
 GetDepotList();
+
+const depotLocationList: any = ref([]);
+const GetDepotLocationList = async () => {
+  depotList.value = [];
+  let res: any = await findDepotLocationList();
+  if (res.code === "200") {
+    depotLocationList.value = res.data;
+  }
+};
+GetDepotLocationList();
+
+const isDepotLocationIdHave = computed(() => {
+  let depotLocationId = params.value.depotLocationId;
+  if (!depotLocationId) {
+    return true;
+  } else {
+    let index = depotLocationList.value.findIndex((e: any) => e.id === depotLocationId);
+    return index !== -1 ? true : false;
+  }
+});
+
 watch(
   () => params.value.operateType,
   n => {
     params.value = {
       operateType: n,
       sourceDepotId: null,
-      sourceLocationNo: null,
+      depotLocationNo: null,
       sourceLocationDescribe: "",
       targetDepotId: null,
       targetLocationNo: null,
@@ -135,7 +149,35 @@ const startScan = async () => {
           params.value.qrSerialNo = result.value.split("|")[1];
           if (!isUploading.value) {
             isUploading.value = true;
-            await addDepotRecord(params.value);
+            let data = {};
+            if (params.value.operateType === 1 || params.value.operateType === 3) {
+              let index = depotLocationList.value.findIndex((e: any) => e.id === params.value.depotLocationId);
+              if (index === -1) {
+                data = {
+                  depotId: params.value.depotId,
+                  depotLocationDesc: params.value.depotLocationDesc,
+                  depotLocationNo: params.value.depotLocationId,
+                  materialId: params.value.materialId,
+                  operateType: params.value.operateType,
+                  qrSerialNo: params.value.qrSerialNo
+                };
+              } else {
+                data = {
+                  depotId: params.value.depotId,
+                  depotLocationId: params.value.depotLocationId,
+                  materialId: params.value.materialId,
+                  operateType: params.value.operateType,
+                  qrSerialNo: params.value.qrSerialNo
+                };
+              }
+            } else {
+              data = {
+                materialId: params.value.materialId,
+                operateType: params.value.operateType,
+                qrSerialNo: params.value.qrSerialNo
+              };
+            }
+            await addDepotRecord(data);
             ElMessage.success({ message: `录入成功,请点击【下一个】继续录入` });
           }
           // stopScan();

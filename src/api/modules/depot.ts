@@ -24,3 +24,23 @@ export const delDepot = (params: { ids: number[] }) => {
 export const findDepotList = () => {
   return http.post<ResPage<Depot.ResDepotList>>(PORT4 + `/depot/findDepotList`, {}, { loading: false });
 };
+
+export const getDepotLocation = (params: any) => {
+  return http.post(PORT4 + `/depotLocation/findAll`, params);
+};
+
+export const findDepotLocationList = () => {
+  return http.post(PORT4 + `/depotLocation/findDepotLocationList`, {}, { loading: false });
+};
+
+export const delDepotLocation = (params: { ids: number[] }) => {
+  return http.deleteBody(PORT4 + `/depotLocation/delete`, params);
+};
+
+export const findDepotStorages = (params: any) => {
+  return http.post(PORT4 + `/depotStorage/findDepotStorages`, params);
+};
+
+export const exportDepotStorage = params => {
+  return http.download(PORT4 + `/depotStorage/exportDepotStorage`, params);
+};

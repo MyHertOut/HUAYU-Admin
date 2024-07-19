@@ -10,7 +10,7 @@
     >
       <!-- 表格 header 按钮 -->
       <template #tableHeader="scope">
-        <el-button v-auth="'add'" type="primary" :icon="CirclePlus" @click="openDrawer('新增')">新增仓库</el-button>
+        <el-button type="primary" :icon="CirclePlus" @click="openDrawer('新增')">新增仓库</el-button>
         <el-button type="danger" :icon="Delete" plain :disabled="!scope.isSelected" @click="batchDelete(scope.selectedListIds)">
           批量删除仓库
         </el-button>
@@ -21,6 +21,7 @@
       <!-- 表格操作 -->
       <template #operation="scope">
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
+        <el-button type="primary" link :icon="View" @click="openKuWei(scope.row)">查看库位</el-button>
         <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', scope.row)">编辑</el-button>
         <el-button type="primary" link :icon="Delete" @click="deleteFun(scope.row)">删除</el-button>
       </template>
@@ -32,6 +33,7 @@
 
 <script setup lang="tsx" name="warehouseManage">
 import { ref, reactive } from "vue";
+import { useRouter } from "vue-router";
 import { Depot } from "@/api/interface";
 import { useHandleData } from "@/hooks/useHandleData";
 import { ElMessage } from "element-plus";
@@ -79,8 +81,7 @@ const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
   { prop: "depotName", label: "名称", search: { el: "input", key: "name" } },
   { prop: "depotNo", label: "编号" },
   { prop: "depotTypeName", label: "类型" },
-  // { prop: "depotAddress", label: "地址" },
-  // { prop: "depotArea", label: "区域" },
+  { prop: "depotStorage", label: "库存" },
   {
     prop: "depotOwner",
     label: "负责人",
@@ -90,7 +91,7 @@ const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
     width: 300
   },
   { prop: "createTime", label: "创建时间", width: 180 },
-  { prop: "operation", label: "操作", fixed: "right", width: 220 }
+  { prop: "operation", label: "操作", fixed: "right", width: 320 }
 ]);
 
 const userList: any = ref([]);
@@ -145,5 +146,16 @@ const openDrawer = (title: string, row: Partial<Depot.ResDepotList> = {}) => {
     getTableList: proTable.value?.getTableList
   };
   drawerRef.value?.acceptParams(params);
+};
+
+const router = useRouter();
+const openKuWei = (row: any) => {
+  router.push({
+    path: "/warehouseManage/kuWeiList",
+    query: {
+      depotId: row.id,
+      tabTitle: row.depotName + "库位列表"
+    }
+  });
 };
 </script>

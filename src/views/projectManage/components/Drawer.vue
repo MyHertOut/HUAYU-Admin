@@ -147,6 +147,8 @@ const handleSubmit = () => {
       delete drawerProps.value.row.updateTime;
       if (drawerProps.value.title === "复制") {
         delete drawerProps.value.row.id;
+        drawerProps.value.row.qrBatchQty = null;
+        drawerProps.value.row.qrBatchNo = null;
       }
       await drawerProps.value.api!(drawerProps.value.row);
       ElMessage.success({ message: `${drawerProps.value.title}标识卡成功！` });
