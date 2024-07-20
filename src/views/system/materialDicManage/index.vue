@@ -11,6 +11,8 @@
       <!-- 表格 header 按钮 -->
       <template #tableHeader="scope">
         <el-button v-auth="'add'" type="primary" :icon="CirclePlus" @click="openDrawer('新增')">新增主数据</el-button>
+        <el-button v-auth="'batchAdd'" type="primary" :icon="Upload" plain @click="batchAdd">批量添加</el-button>
+        <el-button v-auth="'export'" type="primary" :icon="Download" plain @click="downloadFile">导出数据</el-button>
         <el-button type="danger" :icon="Delete" plain :disabled="!scope.isSelected" @click="batchDelete(scope.selectedListIds)">
           批量删除主数据
         </el-button>
@@ -37,13 +39,22 @@
 import { ref, reactive } from "vue";
 import { MaterialDic } from "@/api/interface";
 import { useHandleData } from "@/hooks/useHandleData";
-import { ElMessage } from "element-plus";
+import { useDownload } from "@/hooks/useDownload";
+import { ElMessage, ElMessageBox } from "element-plus";
 import ProTable from "@/components/ProTable/index.vue";
 import ImportExcel from "@/components/ImportExcel/index.vue";
 import Drawer from "./components/Drawer.vue";
 import { ProTableInstance, ColumnProps } from "@/components/ProTable/interface";
-import { CirclePlus, Delete, EditPen, View } from "@element-plus/icons-vue";
-import { getMaterialDicList, addMaterialDic, editMaterialDic, delMaterialDic } from "@/api/modules/materialDic";
+import { CirclePlus, Delete, EditPen, View, Upload, Download } from "@element-plus/icons-vue";
+import {
+  getMaterialDicList,
+  addMaterialDic,
+  editMaterialDic,
+  delMaterialDic,
+  exportExcelTemplate,
+  exportExcel,
+  importExcel
+} from "@/api/modules/materialDic";
 import moment from "moment";
 
 // ProTable 实例
@@ -106,6 +117,23 @@ const batchDelete = async (ids: string[]) => {
   await useHandleData(delMaterialDic, { ids }, "删除所选主数据信息");
   proTable.value?.clearSelection();
   proTable.value?.getTableList();
+};
+
+const downloadFile = async () => {
+  ElMessageBox.confirm("确认导出数据?", "温馨提示", { type: "warning" }).then(() =>
+    useDownload(exportExcel, "主数据列表", proTable.value?.searchParam)
+  );
+};
+
+const dialogRef = ref<InstanceType<typeof ImportExcel> | null>(null);
+const batchAdd = () => {
+  const params = {
+    title: "主数据",
+    tempApi: exportExcelTemplate,
+    importApi: importExcel,
+    getTableList: proTable.value?.getTableList
+  };
+  dialogRef.value?.acceptParams(params);
 };
 
 // 打开 drawer(新增、查看、编辑)

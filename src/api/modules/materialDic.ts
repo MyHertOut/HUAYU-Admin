@@ -28,3 +28,15 @@ export const findMaterialDictionaryList = () => {
     { loading: false }
   );
 };
+
+export const exportExcelTemplate = () => {
+  return http.download(PORT4 + `/materialDictionary/exportExcelTemplate`);
+};
+
+export const exportExcel = params => {
+  return http.download(PORT4 + `/materialDictionary/exportExcel`, params);
+};
+
+export const importExcel = (params: FormData) => {
+  return http.post(PORT4 + `/materialDictionary/importExcel`, params);
+};

@@ -31,5 +31,5 @@ export const exportExcel = params => {
 };
 
 export const importExcel = (params: FormData) => {
-  return http.download(PORT4 + `/material/importExcel`, params);
+  return http.post(PORT4 + `/material/importExcel`, params);
 };
