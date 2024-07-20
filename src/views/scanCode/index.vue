@@ -12,12 +12,20 @@
 
       <div style="padding: 10px; background: #efefef" v-if="params.operateType === 1 || params.operateType === 3">
         <el-form-item label="仓库" prop="depotId">
-          <el-select v-model="params.depotId" filterable default-first-option placeholder="请选择仓库" clearable>
+          <el-select
+            @focus="GetDepotList()"
+            v-model="params.depotId"
+            filterable
+            default-first-option
+            placeholder="请选择仓库"
+            clearable
+          >
             <el-option v-for="(item, key) in depotList" :key="key" :label="item.depotName" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="库位号" prop="depotLocationId">
           <el-select
+            @focus="GetDepotLocationList()"
             v-model="params.depotLocationId"
             filterable
             allow-create
@@ -26,7 +34,7 @@
             placeholder="输入查询，未找到的亦可创建"
             clearable
           >
-            <el-option v-for="(item, key) in depotLocationList" :key="key" :label="item.partNo" :value="item.partNo" />
+            <el-option v-for="(item, key) in depotLocationList" :key="key" :label="item.locationNo" :value="item.id" />
           </el-select>
         </el-form-item>
         <el-form-item label="库位描述" prop="depotLocationDesc" v-if="!isDepotLocationIdHave">
