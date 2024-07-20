@@ -133,6 +133,11 @@ export namespace Depot {
     createTime: string;
     updateTime: string;
     deleteFlag: number;
+    depotStorage: number;
+    locationStorage: number;
+    operateType: number;
+    materialNum: number;
+    locationDesc: string;
   }
 }
 

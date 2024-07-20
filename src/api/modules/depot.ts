@@ -29,8 +29,8 @@ export const getDepotLocation = (params: any) => {
   return http.post(PORT4 + `/depotLocation/findAll`, params);
 };
 
-export const findDepotLocationList = () => {
-  return http.post(PORT4 + `/depotLocation/findDepotLocationList`, {}, { loading: false });
+export const findDepotLocationList = (params: any) => {
+  return http.post(PORT4 + `/depotLocation/findDepotLocationList`, params, { loading: false });
 };
 
 export const delDepotLocation = (params: { ids: number[] }) => {
@@ -43,4 +43,8 @@ export const findDepotStorages = (params: any) => {
 
 export const exportDepotStorage = params => {
   return http.download(PORT4 + `/depotStorage/exportDepotStorage`, params);
+};
+
+export const updateMaterialLocation = (params: any) => {
+  return http.put(PORT4 + `/depotStorage/updateMaterialLocation`, params);
 };

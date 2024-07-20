@@ -96,8 +96,10 @@ GetDepotList();
 
 const depotLocationList: any = ref([]);
 const GetDepotLocationList = async () => {
-  depotList.value = [];
-  let res: any = await findDepotLocationList();
+  depotLocationList.value = [];
+  let res: any = await findDepotLocationList({
+    depotId: params.value.depotId
+  });
   if (res.code === "200") {
     depotLocationList.value = res.data;
   }

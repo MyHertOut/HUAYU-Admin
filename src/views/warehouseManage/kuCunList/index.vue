@@ -12,9 +12,32 @@
       <template #tableHeader="">
         <el-button type="primary" :icon="Download" plain @click="downloadFile">导出数据</el-button>
       </template>
+
+      <template #materialNumHeader="scope">
+        <span style="font-size: 16px; font-weight: bolder; color: var(--el-color-primary)"> {{ scope.column.label }}</span>
+      </template>
       <template #produceDate="scope"> {{ moment(scope.row.produceDate).format("M/D/YYYY") }} </template>
       <template #checkDate="scope"> {{ moment(scope.row.checkDate).format("M/D/YYYY") }} </template>
       <template #createTime="scope"> {{ moment(scope.row.createTime).format("YYYY-MM-DD hh:mm:ss") }} </template>
+      <template #depotLocationNo="scope">
+        <span v-if="!scope.row.isTransfer">{{ scope.row.depotLocationNo }}</span>
+        <el-select
+          v-if="scope.row.isTransfer"
+          @focus="GetDepotLocationList(scope.row.depotId)"
+          v-model="depotLocationId"
+          filterable
+          default-first-option
+          :reserve-keyword="false"
+          clearable
+        >
+          <el-option v-for="(item, key) in depotLocationList" :key="key" :label="item.locationNo" :value="item.id" />
+        </el-select>
+      </template>
+      <template #operation="scope">
+        <el-button type="primary" link v-if="!scope.row.isTransfer" @click="scope.row.isTransfer = true">移动库位</el-button>
+        <el-button type="primary" link v-if="scope.row.isTransfer" @click="save(scope)">保存</el-button>
+        <el-button type="primary" link v-if="scope.row.isTransfer" @click="scope.row.isTransfer = false">取消</el-button>
+      </template>
     </ProTable>
     <ImportExcel ref="dialogRef" />
   </div>
@@ -30,7 +53,7 @@ import ProTable from "@/components/ProTable/index.vue";
 import ImportExcel from "@/components/ImportExcel/index.vue";
 import { ProTableInstance, ColumnProps } from "@/components/ProTable/interface";
 import { Download } from "@element-plus/icons-vue";
-import { findDepotStorages, exportDepotStorage } from "@/api/modules/depot";
+import { findDepotStorages, exportDepotStorage, findDepotLocationList, updateMaterialLocation } from "@/api/modules/depot";
 import { findUserList } from "@/api/modules/user";
 import moment from "moment";
 
@@ -40,11 +63,14 @@ const route = useRoute();
 const proTable = ref<ProTableInstance>();
 
 // 如果表格需要初始化请求参数，直接定义传给 ProTable (之后每次请求都会自动带上该参数，此参数更改之后也会一直带上，改变此参数会自动刷新表格数据)
-const initParam = reactive({ depotLocationId: Number(route.query?.depotLocationId) });
+const initParam = reactive(route.query?.depotLocationId ? { depotLocationId: Number(route.query?.depotLocationId) } : {});
 
 // dataCallback 是对于返回的表格数据做处理，如果你后台返回的数据不是 list && total && pageNo && pageSize 这些字段，可以在这里进行处理成这些字段
 // 或者直接去 hooks/useTable.ts 文件中把字段改为你后端对应的就行
 const dataCallback = (data: any) => {
+  data.items.forEach((e: any) => {
+    e.isTransfer = false;
+  });
   return {
     list: data.items,
     total: data.totalRows,
@@ -68,20 +94,43 @@ const getTableList = (params: any) => {
 // 表格配置项
 const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
   { type: "selection", fixed: "left", width: 70 },
-  { prop: "materialName", label: "标识卡名称", search: { el: "input" } },
-  { prop: "qrSerialNo", label: "标识卡编号", search: { el: "input" } },
-  { prop: "depotName", label: "所在仓库", search: { el: "input" } },
-  { prop: "depotLocationNo", label: "所在库位", search: { el: "input" } },
+  // {
+  //   prop: "operateType",
+  //   label: "类型",
+  //   render: scope => {
+  //     return scope.row.operateType === 1 ? "入库" : scope.row.operateType === 3 ? "移库" : "出库";
+  //   },
+  //   fixed: "left"
+  // },
+  { prop: "qrSerialNo", label: "编号", search: { el: "input" }, width: 160, fixed: "left" },
+  { prop: "partNo", label: "件号", search: { el: "input" }, width: 160 },
+  { prop: "materialName", label: "零件名称", search: { el: "input" }, width: 180 },
+  { prop: "materialProject", label: "项目名称", width: 180 },
+  { prop: "produceDate", label: "生产日期", width: 100 },
+  { prop: "batchNo", label: "批次" },
+  { prop: "shift", label: "班次" },
+  { prop: "checker", label: "检验员" },
+  { prop: "checkDate", label: "检验日期", width: 100 },
   {
     prop: "depotOwner",
-    label: "负责人",
+    label: "仓库负责人",
     render: scope => {
       return <>{dealName(scope.row.depotOwner)}</>;
     },
-    width: 300
+    width: 100
   },
-  { prop: "createTime", label: "创建时间", width: 180 }
-  // { prop: "operation", label: "操作", fixed: "right", width: 220 }
+  { prop: "createTime", label: "入库时间", width: 180 },
+  { prop: "depotName", label: "所在仓库", search: { el: "input" }, width: 100, fixed: "right" },
+  { prop: "depotLocationNo", label: "所在库位", search: { el: "input" }, width: 100, fixed: "right" },
+  {
+    prop: "materialNum",
+    label: "数量",
+    render: scope => {
+      return <span style="color:var(--el-color-primary);font-weight: bolder;font-size: 16px;">{scope.row.materialNum}</span>;
+    },
+    fixed: "right"
+  },
+  { prop: "operation", label: "操作", fixed: "right", width: 120 }
 ]);
 
 const userList: any = ref([]);
@@ -115,5 +164,27 @@ const downloadFile = async () => {
   ElMessageBox.confirm("确认导出数据?", "温馨提示", { type: "warning" }).then(() =>
     useDownload(exportDepotStorage, "库存列表", proTable.value?.searchParam)
   );
+};
+
+const depotLocationId: any = ref();
+const depotLocationList: any = ref([]);
+const GetDepotLocationList = async (depotId: any) => {
+  depotLocationList.value = [];
+  let res: any = await findDepotLocationList({
+    depotId: depotId
+  });
+  if (res.code === "200") {
+    depotLocationList.value = res.data;
+  }
+};
+
+const save = async (scope: any) => {
+  await updateMaterialLocation({
+    id: scope.row.id,
+    depotLocationId: depotLocationId.value
+  });
+  ElMessage.success("移动库位成功");
+  scope.row.isTransfer = false;
+  proTable.value?.getTableList();
 };
 </script>

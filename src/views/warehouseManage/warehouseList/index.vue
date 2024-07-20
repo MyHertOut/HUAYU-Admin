@@ -15,9 +15,11 @@
           批量删除仓库
         </el-button>
       </template>
-      <template #produceDate="scope"> {{ moment(scope.row.produceDate).format("M/D/YYYY") }} </template>
-      <template #checkDate="scope"> {{ moment(scope.row.checkDate).format("M/D/YYYY") }} </template>
+      <template #depotStorageHeader="scope">
+        <span style="font-size: 16px; font-weight: bolder; color: var(--el-color-primary)"> {{ scope.column.label }}</span>
+      </template>
       <template #createTime="scope"> {{ moment(scope.row.createTime).format("YYYY-MM-DD hh:mm:ss") }} </template>
+      <template #updateTime="scope"> {{ moment(scope.row.updateTime).format("YYYY-MM-DD hh:mm:ss") }} </template>
       <!-- 表格操作 -->
       <template #operation="scope">
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
@@ -81,7 +83,6 @@ const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
   { prop: "depotName", label: "名称", search: { el: "input", key: "name" } },
   { prop: "depotNo", label: "编号" },
   { prop: "depotTypeName", label: "类型" },
-  { prop: "depotStorage", label: "库存" },
   {
     prop: "depotOwner",
     label: "负责人",
@@ -91,6 +92,16 @@ const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
     width: 300
   },
   { prop: "createTime", label: "创建时间", width: 180 },
+  { prop: "updateTime", label: "更新时间", width: 180 },
+  {
+    prop: "depotStorage",
+    label: "库存(件)",
+    render: scope => {
+      return <span style="color:var(--el-color-primary);font-weight: bolder;font-size: 16px;">{scope.row.depotStorage}</span>;
+    },
+    fixed: "right",
+    width: 140
+  },
   { prop: "operation", label: "操作", fixed: "right", width: 320 }
 ]);
 

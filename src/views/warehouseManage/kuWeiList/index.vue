@@ -14,9 +14,11 @@
           批量删除库位
         </el-button>
       </template>
-      <template #produceDate="scope"> {{ moment(scope.row.produceDate).format("M/D/YYYY") }} </template>
-      <template #checkDate="scope"> {{ moment(scope.row.checkDate).format("M/D/YYYY") }} </template>
+      <template #locationStorageHeader="scope">
+        <span style="font-size: 16px; font-weight: bolder; color: var(--el-color-primary)"> {{ scope.column.label }}</span>
+      </template>
       <template #createTime="scope"> {{ moment(scope.row.createTime).format("YYYY-MM-DD hh:mm:ss") }} </template>
+      <template #updateTime="scope"> {{ moment(scope.row.updateTime).format("YYYY-MM-DD hh:mm:ss") }} </template>
       <!-- 表格操作 -->
       <template #operation="scope">
         <el-button type="primary" link :icon="View" @click="openKuCun(scope.row)">查看库存明细</el-button>
@@ -49,7 +51,7 @@ const route = useRoute();
 const proTable = ref<ProTableInstance>();
 
 // 如果表格需要初始化请求参数，直接定义传给 ProTable (之后每次请求都会自动带上该参数，此参数更改之后也会一直带上，改变此参数会自动刷新表格数据)
-const initParam = reactive({ depotId: Number(route.query?.depotId) });
+const initParam = reactive(route.query?.depotId ? { depotId: Number(route.query?.depotId) } : {});
 
 // dataCallback 是对于返回的表格数据做处理，如果你后台返回的数据不是 list && total && pageNo && pageSize 这些字段，可以在这里进行处理成这些字段
 // 或者直接去 hooks/useTable.ts 文件中把字段改为你后端对应的就行
@@ -79,7 +81,6 @@ const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
   { type: "selection", fixed: "left", width: 70 },
   { prop: "locationNo", label: "库位名称", search: { el: "input" } },
   { prop: "locationDesc", label: "库位描述" },
-  { prop: "locationStorage", label: "库位库存" },
   { prop: "depotName", label: "所属仓库", search: { el: "input" } },
   {
     prop: "depotOwner",
@@ -90,6 +91,16 @@ const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
     width: 300
   },
   { prop: "createTime", label: "创建时间", width: 180 },
+  { prop: "updateTime", label: "更新时间", width: 180 },
+  {
+    prop: "locationStorage",
+    label: "库位存量(件)",
+    render: scope => {
+      return <span style="color:var(--el-color-primary);font-weight: bolder;font-size: 16px;">{scope.row.locationStorage}</span>;
+    },
+    fixed: "right",
+    width: 140
+  },
   { prop: "operation", label: "操作", fixed: "right", width: 220 }
 ]);
 
