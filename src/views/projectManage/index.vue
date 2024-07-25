@@ -216,7 +216,7 @@ const printFun = async (row: any) => {
   const workbook: any = new ExcelJS.Workbook();
   const worksheet: any = workbook.addWorksheet("Material Label");
 
-  const globalFontStyle = { bold: true, color: { argb: "000000" }, name: "Arial", family: 2, size: 14 };
+  const globalFontStyle = { bold: true, color: { argb: "000000" }, name: "Arial", family: 2, size: 16 };
 
   const borderStyle = {
     top: { style: "medium" },
@@ -227,11 +227,11 @@ const printFun = async (row: any) => {
   let printDate = moment(new Date()).format("YYYYMMDDHHMMSS");
   for (let i = 0; i < row.qrBatchQty; i++) {
     // 设置列宽和行高
-    worksheet.getColumn(1).width = 19.5;
+    worksheet.getColumn(1).width = 28;
     worksheet.getColumn(2).width = 28;
     worksheet.getColumn(3).width = 28;
     worksheet.getColumn(4).width = 28;
-    worksheet.getRow(8 * i + 1).height = 162;
+    worksheet.getRow(8 * i + 1).height = 130;
     worksheet.getRow(8 * i + 2).height = 80;
     worksheet.getRow(8 * i + 3).height = 80;
     worksheet.getRow(8 * i + 4).height = 80;
@@ -259,7 +259,8 @@ const printFun = async (row: any) => {
     });
     worksheet.addImage(imageId, {
       tl: { col: 0, row: 8 * i }, // top-left position of the image
-      ext: { width: 140, height: 140 }, // size of the image
+      br: { col: 1, row: 8 * i + 1 }, // 图片的右下角位置，相对于起始位置的偏移
+      extension: { width: 130, height: 130 }, // size of the image
       editAs: "oneCell"
     });
     worksheet.getCell(`A${8 * i + 1}`).alignment = { vertical: "middle", horizontal: "center" };
@@ -292,49 +293,49 @@ const printFun = async (row: any) => {
     worksheet.getCell(`${startRow + 1}`, 1).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 1}`, 1).border = borderStyle;
     worksheet.getCell(`${startRow + 1}`, 2).value = row.materialProject;
-    worksheet.getCell(`${startRow + 1}`, 2).alignment = { vertical: "middle", horizontal: "center" };
+    worksheet.getCell(`${startRow + 1}`, 2).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
     worksheet.getCell(`${startRow + 1}`, 2).border = borderStyle;
 
     worksheet.getCell(`${startRow + 1}`, 3).value = "零件名称\nDescription";
     worksheet.getCell(`${startRow + 1}`, 3).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 1}`, 3).border = borderStyle;
     worksheet.getCell(`${startRow + 1}`, 4).value = row.materialName;
-    worksheet.getCell(`${startRow + 1}`, 4).alignment = { vertical: "middle", horizontal: "center" };
+    worksheet.getCell(`${startRow + 1}`, 4).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
     worksheet.getCell(`${startRow + 1}`, 4).border = borderStyle;
 
     worksheet.getCell(`${startRow + 2}`, 1).value = "件号\nPart Number";
     worksheet.getCell(`${startRow + 2}`, 1).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 2}`, 1).border = borderStyle;
     worksheet.getCell(`${startRow + 2}`, 2).value = row.partNo;
-    worksheet.getCell(`${startRow + 2}`, 2).alignment = { vertical: "middle", horizontal: "center" };
+    worksheet.getCell(`${startRow + 2}`, 2).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
     worksheet.getCell(`${startRow + 2}`, 2).border = borderStyle;
 
     worksheet.getCell(`${startRow + 2}`, 3).value = "生产日期\nMFD.";
     worksheet.getCell(`${startRow + 2}`, 3).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 2}`, 3).border = borderStyle;
     worksheet.getCell(`${startRow + 2}`, 4).value = row.produceDate;
-    worksheet.getCell(`${startRow + 2}`, 4).alignment = { vertical: "middle", horizontal: "center" };
+    worksheet.getCell(`${startRow + 2}`, 4).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
     worksheet.getCell(`${startRow + 2}`, 4).border = borderStyle;
 
     worksheet.getCell(`${startRow + 3}`, 1).value = "批次\nBatch NO.";
     worksheet.getCell(`${startRow + 3}`, 1).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 3}`, 1).border = borderStyle;
     worksheet.getCell(`${startRow + 3}`, 2).value = row.batchNo;
-    worksheet.getCell(`${startRow + 3}`, 2).alignment = { vertical: "middle", horizontal: "center" };
+    worksheet.getCell(`${startRow + 3}`, 2).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
     worksheet.getCell(`${startRow + 3}`, 2).border = borderStyle;
 
     worksheet.getCell(`${startRow + 3}`, 3).value = "数量\nQuantity";
     worksheet.getCell(`${startRow + 3}`, 3).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 3}`, 3).border = borderStyle;
     worksheet.getCell(`${startRow + 3}`, 4).value = row.materialNum;
-    worksheet.getCell(`${startRow + 3}`, 4).alignment = { vertical: "middle", horizontal: "center" };
+    worksheet.getCell(`${startRow + 3}`, 4).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
     worksheet.getCell(`${startRow + 3}`, 4).border = borderStyle;
 
     worksheet.getCell(`${startRow + 4}`, 1).value = "班次\nShift";
     worksheet.getCell(`${startRow + 4}`, 1).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 4}`, 1).border = borderStyle;
     worksheet.getCell(`${startRow + 4}`, 2).value = row.shift;
-    worksheet.getCell(`${startRow + 4}`, 2).alignment = { vertical: "middle", horizontal: "center" };
+    worksheet.getCell(`${startRow + 4}`, 2).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
     worksheet.getCell(`${startRow + 4}`, 2).border = borderStyle;
 
     let insDateRange = worksheet.getCell(`${startRow + 4}`, 3).address + ":" + worksheet.getCell(`${startRow + 5}`, 3).address;
@@ -346,14 +347,14 @@ const printFun = async (row: any) => {
     let insDateValRange = worksheet.getCell(`${startRow + 4}`, 4).address + ":" + worksheet.getCell(`${startRow + 5}`, 4).address;
     worksheet.mergeCells(insDateValRange);
     worksheet.getCell(insDateValRange).value = row.checkDate;
-    worksheet.getCell(insDateValRange).alignment = { vertical: "middle", horizontal: "center" };
+    worksheet.getCell(insDateValRange).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
     worksheet.getCell(insDateValRange).border = borderStyle;
 
     worksheet.getCell(`${startRow + 5}`, 1).value = "检验员\nInspector";
     worksheet.getCell(`${startRow + 5}`, 1).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 5}`, 1).border = borderStyle;
     worksheet.getCell(`${startRow + 5}`, 2).value = row.checker;
-    worksheet.getCell(`${startRow + 5}`, 2).alignment = { vertical: "middle", horizontal: "center" };
+    worksheet.getCell(`${startRow + 5}`, 2).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
     worksheet.getCell(`${startRow + 5}`, 2).border = borderStyle;
 
     let endDateNoRange = worksheet.getCell(`${startRow + 6}`, 1).address + ":" + worksheet.getCell(`${startRow + 6}`, 4).address;
@@ -369,7 +370,7 @@ const printFun = async (row: any) => {
   // 导出 Excel 文件
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-  saveAs(blob, `标识卡打印${moment(new Date()).format("YYYY-MM-DD-HH-MM-SS")}.xlsx`);
+  saveAs(blob, `标识卡打印${printDate}.xlsx`);
   printLoading.value = false;
   printNum.value = "";
 };

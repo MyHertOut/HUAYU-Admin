@@ -37,13 +37,14 @@
             <el-option v-for="(item, key) in depotLocationList" :key="key" :label="item.locationNo" :value="item.id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="库位描述" prop="depotLocationDesc" v-if="!isDepotLocationIdHave">
-          <el-input
-            :disabled="isDepotLocationIdHave"
-            v-model="params.depotLocationDesc"
-            placeholder="请输入库位描述"
-            clearable
-          ></el-input>
+        <!-- v-if="!isDepotLocationIdHave" -->
+        <el-form-item label="备注" prop="depotLocationDesc">
+          <el-input v-model="params.depotLocationDesc" placeholder="请输入备注" clearable></el-input>
+        </el-form-item>
+      </div>
+      <div style="padding: 10px; background: #efefef" v-if="params.operateType === 2">
+        <el-form-item label="备注" prop="depotLocationDesc">
+          <el-input v-model="params.depotLocationDesc" placeholder="请输入备注" clearable></el-input>
         </el-form-item>
       </div>
     </el-form>
@@ -61,7 +62,7 @@
 </template>
 
 <script setup lang="ts" name="scanCode">
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
+import { onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
 import { ElMessage, FormInstance } from "element-plus";
 import { BrowserMultiFormatReader, NotFoundException } from "@zxing/library";
 import { findDepotList, findDepotLocationList } from "@/api/modules/depot";
@@ -106,15 +107,15 @@ const GetDepotLocationList = async () => {
 };
 GetDepotLocationList();
 
-const isDepotLocationIdHave = computed(() => {
-  let depotLocationId = params.value.depotLocationId;
-  if (!depotLocationId) {
-    return true;
-  } else {
-    let index = depotLocationList.value.findIndex((e: any) => e.id === depotLocationId);
-    return index !== -1 ? true : false;
-  }
-});
+// const isDepotLocationIdHave = computed(() => {
+//   let depotLocationId = params.value.depotLocationId;
+//   if (!depotLocationId) {
+//     return true;
+//   } else {
+//     let index = depotLocationList.value.findIndex((e: any) => e.id === depotLocationId);
+//     return index !== -1 ? true : false;
+//   }
+// });
 
 watch(
   () => params.value.operateType,

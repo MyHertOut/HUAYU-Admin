@@ -45,7 +45,12 @@
         ></el-input>
       </el-form-item>
       <el-form-item label="生产日期" prop="produceDate">
-        <el-input v-model="drawerProps.row!.produceDate" placeholder="默认当天" clearable disabled></el-input>
+        <el-input
+          v-model="drawerProps.row!.produceDate"
+          placeholder="默认当天"
+          clearable
+          :disabled="isProduceDateDisabled"
+        ></el-input>
       </el-form-item>
       <el-form-item label="批次" prop="batchNo">
         <el-input v-model="drawerProps.row!.batchNo" placeholder="请输入批次号" clearable></el-input>
@@ -54,10 +59,11 @@
         <el-input-number style="width: 100%" v-model="drawerProps.row!.materialNum" placeholder="请输入数量" clearable />
       </el-form-item>
       <el-form-item label="班次" prop="shift">
-        <el-select v-model="drawerProps.row!.shift" placeholder="请选择班次" clearable>
+        <el-input v-model="drawerProps.row!.shift" placeholder="请输入班次" clearable></el-input>
+        <!-- <el-select v-model="drawerProps.row!.shift" placeholder="请选择班次" clearable>
           <el-option label="A" value="A" />
           <el-option label="B" value="B" />
-        </el-select>
+        </el-select> -->
       </el-form-item>
       <el-form-item label="检验员" prop="checker">
         <el-input v-model="drawerProps.row!.checker" placeholder="请输入检验员" clearable></el-input>
@@ -122,6 +128,10 @@ const drawerProps = ref<DrawerProps>({
   isView: false,
   title: "",
   row: {}
+});
+
+const isProduceDateDisabled = computed(() => {
+  return drawerProps.value.title === "复制" ? false : true;
 });
 
 // 接收父组件传过来的参数

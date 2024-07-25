@@ -77,7 +77,7 @@ const getTableList = (params: any) => {
 const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
   { type: "selection", fixed: "left", width: 70 },
   { prop: "locationNo", label: "库位名称", search: { el: "input", key: "name" } },
-  { prop: "locationDesc", label: "库位描述" },
+  { prop: "locationDesc", label: "备注" },
   { prop: "locationStorage", label: "库位库存" },
   { prop: "depotName", label: "所属仓库" },
   {
