@@ -56,6 +56,7 @@ import { Download } from "@element-plus/icons-vue";
 import { findDepotStorages, exportDepotStorage, findDepotLocationList, updateMaterialLocation } from "@/api/modules/depot";
 import { findUserList } from "@/api/modules/user";
 import moment from "moment";
+import { findMaterialDictionaryList } from "@/api/modules/materialDic";
 
 const route = useRoute();
 
@@ -89,6 +90,15 @@ const getTableList = (params: any) => {
   return findDepotStorages(newParams);
 };
 
+const materialDicList: any = ref([]);
+const GetMaterialDicList = async () => {
+  materialDicList.value = [];
+  let res: any = await findMaterialDictionaryList();
+  if (res.code === "200") {
+    materialDicList.value = res.data;
+  }
+};
+GetMaterialDicList();
 // 页面按钮权限（按钮权限既可以使用 hooks，也可以直接使用 v-auth 指令，指令适合直接绑定在按钮上，hooks 适合根据按钮权限显示不同的内容）
 
 // 表格配置项
@@ -103,7 +113,14 @@ const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
   //   fixed: "left"
   // },
   { prop: "qrSerialNo", label: "编号", search: { el: "input" }, width: 160, fixed: "left" },
-  { prop: "partNo", label: "件号", search: { el: "input" }, width: 160 },
+  {
+    prop: "partNo",
+    label: "件号",
+    enum: materialDicList,
+    search: { el: "select", props: { filterable: true } },
+    fieldNames: { label: "partNo", value: "partNo" },
+    width: 180
+  },
   { prop: "materialName", label: "零件名称", search: { el: "input" }, width: 180 },
   { prop: "materialProject", label: "项目名称", width: 180 },
   { prop: "produceDate", label: "生产日期", width: 100 },
@@ -121,7 +138,7 @@ const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
   },
   { prop: "createTime", label: "入库时间", width: 180 },
   { prop: "depotName", label: "所在仓库", search: { el: "input" }, width: 100, fixed: "right" },
-  { prop: "depotLocationNo", label: "所在库位", search: { el: "input" }, width: 100, fixed: "right" },
+  { prop: "depotLocationNo", label: "所在库位", search: { el: "input" }, width: 140, fixed: "right" },
   {
     prop: "materialNum",
     label: "数量",

@@ -53,7 +53,8 @@ import {
   delMaterialDic,
   exportExcelTemplate,
   exportExcel,
-  importExcel
+  importExcel,
+  findMaterialDictionaryList
 } from "@/api/modules/materialDic";
 import moment from "moment";
 
@@ -85,11 +86,26 @@ const getTableList = (params: any) => {
 };
 
 // 页面按钮权限（按钮权限既可以使用 hooks，也可以直接使用 v-auth 指令，指令适合直接绑定在按钮上，hooks 适合根据按钮权限显示不同的内容）
-
+const materialDicList: any = ref([]);
+const GetMaterialDicList = async () => {
+  materialDicList.value = [];
+  let res: any = await findMaterialDictionaryList();
+  if (res.code === "200") {
+    materialDicList.value = res.data;
+  }
+};
+GetMaterialDicList();
 // 表格配置项
 const columns = reactive<ColumnProps<MaterialDic.ResMaterialDicList>[]>([
   { type: "selection", fixed: "left", width: 70 },
-  { prop: "partNo", label: "零件号", search: { el: "input" }, width: 180 },
+  {
+    prop: "partNo",
+    label: "零件号",
+    enum: materialDicList,
+    search: { el: "select", props: { filterable: true } },
+    fieldNames: { label: "partNo", value: "partNo" },
+    width: 180
+  },
   { prop: "materialName", label: "零件名称", search: { el: "input" }, width: 180 },
   { prop: "projectName", label: "项目名称", search: { el: "input" }, width: 180 },
   { prop: "reservedAttr1", label: "规格型号", width: 180 },

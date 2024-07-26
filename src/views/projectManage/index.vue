@@ -103,12 +103,29 @@ const getTableList = (params: any) => {
   return getProjectList(newParams);
 };
 
+const materialDicList: any = ref([]);
+const GetMaterialDicList = async () => {
+  materialDicList.value = [];
+  let res: any = await findMaterialDictionaryList();
+  if (res.code === "200") {
+    materialDicList.value = res.data;
+  }
+};
+GetMaterialDicList();
+
 // 页面按钮权限（按钮权限既可以使用 hooks，也可以直接使用 v-auth 指令，指令适合直接绑定在按钮上，hooks 适合根据按钮权限显示不同的内容）
 
 // 表格配置项
 const columns = reactive<ColumnProps<Project.ResProjectList>[]>([
   { type: "selection", fixed: "left", width: 70 },
-  { prop: "partNo", label: "件号", search: { el: "input" }, width: 180 },
+  {
+    prop: "partNo",
+    label: "件号",
+    enum: materialDicList,
+    search: { el: "select", props: { filterable: true } },
+    fieldNames: { label: "partNo", value: "partNo" },
+    width: 180
+  },
   { prop: "materialName", label: "零件名称", search: { el: "input" }, width: 180 },
   { prop: "materialProject", label: "项目名称", width: 180 },
   { prop: "produceDate", label: "生产日期", width: 100 },
@@ -122,16 +139,6 @@ const columns = reactive<ColumnProps<Project.ResProjectList>[]>([
   { prop: "updateTime", label: "更新时间", width: 180 },
   { prop: "operation", label: "操作", fixed: "right", width: 280 }
 ]);
-
-const materialDicList: any = ref([]);
-const GetMaterialDicList = async () => {
-  materialDicList.value = [];
-  let res: any = await findMaterialDictionaryList();
-  if (res.code === "200") {
-    materialDicList.value = res.data;
-  }
-};
-GetMaterialDicList();
 
 // 表格拖拽排序
 const sortTable = ({ newIndex, oldIndex }: { newIndex?: number; oldIndex?: number }) => {
@@ -227,11 +234,11 @@ const printFun = async (row: any) => {
   let printDate = moment(new Date()).format("YYYYMMDDHHMMSS");
   for (let i = 0; i < row.qrBatchQty; i++) {
     // 设置列宽和行高
-    worksheet.getColumn(1).width = 28;
+    worksheet.getColumn(1).width = 18.69;
     worksheet.getColumn(2).width = 28;
     worksheet.getColumn(3).width = 28;
     worksheet.getColumn(4).width = 28;
-    worksheet.getRow(8 * i + 1).height = 130;
+    worksheet.getRow(8 * i + 1).height = 140;
     worksheet.getRow(8 * i + 2).height = 80;
     worksheet.getRow(8 * i + 3).height = 80;
     worksheet.getRow(8 * i + 4).height = 80;
@@ -286,7 +293,7 @@ const printFun = async (row: any) => {
       vertical: "middle",
       horizontal: "center"
     };
-    worksheet.getCell(mergeRange).font = globalFontStyle;
+    worksheet.getCell(mergeRange).font = { bold: true, color: { argb: "000000" }, name: "Arial", family: 2, size: 20 };
     worksheet.getCell(mergeRange).border = borderStyle;
 
     worksheet.getCell(`${startRow + 1}`, 1).value = "项目名称\nProject";

@@ -49,6 +49,7 @@ import { ProTableInstance, ColumnProps } from "@/components/ProTable/interface";
 import { Delete, View, Download } from "@element-plus/icons-vue";
 import { getDepotRecordList, delDepotRecord, exportDepotRecord } from "@/api/modules/depotRecord";
 import moment from "moment";
+import { findMaterialDictionaryList } from "@/api/modules/materialDic";
 
 // ProTable 实例
 const proTable = ref<ProTableInstance>();
@@ -78,12 +79,28 @@ const getTableList = (params: any) => {
 };
 
 // 页面按钮权限（按钮权限既可以使用 hooks，也可以直接使用 v-auth 指令，指令适合直接绑定在按钮上，hooks 适合根据按钮权限显示不同的内容）
+const materialDicList: any = ref([]);
+const GetMaterialDicList = async () => {
+  materialDicList.value = [];
+  let res: any = await findMaterialDictionaryList();
+  if (res.code === "200") {
+    materialDicList.value = res.data;
+  }
+};
+GetMaterialDicList();
 
 // 表格配置项
 // sourceDepotId/targetDepotId/materialId/qrBatchNo/qrSerialNo/operateType/materialIds/depotOwner/partNo/operatorId/depotName/depotId/materialName/materialProject/materialBelongTo
 const columns = reactive<ColumnProps<any>[]>([
   { type: "selection", fixed: "left", width: 70 },
-  { prop: "partNo", label: "件号", search: { el: "input" }, width: 120 },
+  {
+    prop: "partNo",
+    label: "件号",
+    enum: materialDicList,
+    search: { el: "select", props: { filterable: true } },
+    fieldNames: { label: "partNo", value: "partNo" },
+    width: 120
+  },
   { prop: "qrSerialNo", label: "编号" },
   { prop: "materialName", label: "零件名称", search: { el: "input" }, width: 120 },
   { prop: "materialProject", label: "项目名称", width: 120 },
