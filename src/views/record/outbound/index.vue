@@ -22,6 +22,9 @@
           批量删除
         </el-button>
       </template>
+      <template #materialNumHeader="scope">
+        <span style="font-size: 16px; font-weight: bolder; color: var(--el-color-primary)"> {{ scope.column.label }}</span>
+      </template>
       <template #createTime="scope"> {{ moment(scope.row.createTime).format("YYYY-MM-DD hh:mm:ss") }} </template>
       <!-- 表格操作 -->
       <template #operation="scope">
@@ -100,10 +103,20 @@ const columns = reactive<ColumnProps<any>[]>([
   },
   { prop: "qrSerialNo", label: "编号" },
   { prop: "materialName", label: "零件名称", search: { el: "input" }, width: 120 },
+  { prop: "materialProject", label: "项目名称", width: 120 },
+  {
+    prop: "materialNum",
+    label: "数量",
+    render: scope => {
+      return <span style="color:var(--el-color-primary);font-weight: bolder;font-size: 16px;">{scope.row.materialNum}</span>;
+    },
+    width: 120
+  },
   { prop: "sourceDepotName", label: "出库仓库", search: { el: "input" }, width: 120 },
   { prop: "sourceLocationNo", label: "出库库位" },
   { prop: "createTime", label: "出库时间", width: 180 },
   { prop: "operatorName", label: "出库人", width: 180 },
+  { prop: "sourceLocationDescribe", label: "备注", width: 180 },
   { prop: "operation", label: "操作", fixed: "right", width: 220 }
 ]);
 

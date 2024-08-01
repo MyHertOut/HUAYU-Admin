@@ -142,9 +142,9 @@ const codeReader: any = new BrowserMultiFormatReader();
 const isUploading: any = ref(false);
 const ruleFormRef = ref<FormInstance>();
 
-const startScan = async () => {
-  console.log(video.value);
+const messageInstance: any = ref(null);
 
+const startScan = async () => {
   ruleFormRef.value!.validate(async valid => {
     if (!valid) return;
     if (!video.value) return;
@@ -156,6 +156,7 @@ const startScan = async () => {
       codeReader.decodeFromVideoDevice(undefined, video.value, async (scanResult, err) => {
         if (scanResult) {
           result.value = scanResult.getText();
+          // result.value = "25|20240801130894-10";
           params.value.materialId = result.value.split("|")[0];
           params.value.qrSerialNo = result.value.split("|")[1];
           if (!isUploading.value) {
@@ -175,6 +176,7 @@ const startScan = async () => {
               } else {
                 data = {
                   depotId: params.value.depotId,
+                  depotLocationDesc: params.value.depotLocationDesc,
                   depotLocationId: params.value.depotLocationId,
                   materialId: params.value.materialId,
                   operateType: params.value.operateType,
@@ -183,15 +185,65 @@ const startScan = async () => {
               }
             } else {
               data = {
+                depotLocationDesc: params.value.depotLocationDesc,
                 materialId: params.value.materialId,
                 operateType: params.value.operateType,
                 qrSerialNo: params.value.qrSerialNo
               };
             }
-            await addDepotRecord(data);
-            ElMessage.success({ message: `录入成功,请点击【下一个】继续录入` });
+            addDepotRecord(data)
+              .then(() => {
+                if (params.value.operateType === 1) {
+                  messageInstance.value = ElMessage.success({
+                    duration: 0,
+                    customClass: "scanMessage",
+                    message: `${params.value.qrSerialNo}入库成功`
+                  });
+                } else if (params.value.operateType === 3) {
+                  messageInstance.value = ElMessage.success({
+                    duration: 0,
+                    customClass: "scanMessage",
+                    message: `${params.value.qrSerialNo}转库成功`
+                  });
+                } else if (params.value.operateType === 2) {
+                  messageInstance.value = ElMessage.success({
+                    duration: 0,
+                    customClass: "scanMessage",
+                    message: `${params.value.qrSerialNo}出库成功`
+                  });
+                }
+              })
+              .catch(err => {
+                console.log(err);
+                if (params.value.operateType === 1) {
+                  messageInstance.value = ElMessage.error({
+                    duration: 0,
+                    customClass: "scanMessage",
+                    message: `${params.value.qrSerialNo}已入库`
+                  });
+                } else if (params.value.operateType === 3) {
+                  if (err.response.data.message.includes("Index")) {
+                    messageInstance.value = ElMessage.error({
+                      duration: 0,
+                      customClass: "scanMessage",
+                      message: `${params.value.qrSerialNo}已出库`
+                    });
+                  } else {
+                    messageInstance.value = ElMessage.error({
+                      duration: 0,
+                      customClass: "scanMessage",
+                      message: `${params.value.qrSerialNo}已转库`
+                    });
+                  }
+                } else if (params.value.operateType === 2) {
+                  messageInstance.value = ElMessage.error({
+                    duration: 0,
+                    customClass: "scanMessage",
+                    message: `${params.value.qrSerialNo}已出库`
+                  });
+                }
+              });
           }
-          // stopScan();
         }
         if (err && !(err instanceof NotFoundException)) {
           console.error(err);
@@ -206,9 +258,15 @@ const startScan = async () => {
 
 const nextUpload = () => {
   isUploading.value = false;
+  if (messageInstance.value) {
+    messageInstance.value.close();
+  }
 };
 
 const stopScan = () => {
+  if (messageInstance.value) {
+    messageInstance.value.close();
+  }
   if (video.value && video.value.srcObject) {
     const stream = video.value.srcObject as MediaStream;
     const tracks = stream.getTracks();
@@ -242,5 +300,8 @@ onBeforeUnmount(() => {
     height: 450px;
     object-fit: cover;
   }
+}
+.scanMessage .el-message__content {
+  white-space: pre;
 }
 </style>

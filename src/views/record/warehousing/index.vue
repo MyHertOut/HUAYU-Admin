@@ -116,6 +116,7 @@ const columns = reactive<ColumnProps<any>[]>([
   { prop: "targetLocationNo", label: "入库库位" },
   { prop: "createTime", label: "入库时间", width: 180 },
   { prop: "operatorName", label: "入库人", width: 180 },
+  { prop: "targetLocationDescribe", label: "备注", width: 180 },
   { prop: "operation", label: "操作", fixed: "right", width: 220 }
 ]);
 

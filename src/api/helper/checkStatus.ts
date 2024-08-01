@@ -27,7 +27,9 @@ export const checkStatus = (status: number, message: string) => {
       ElMessage.error("请求超时！请您稍后重试");
       break;
     case 500:
-      ElMessage.error(message || "服务异常！");
+      if (!message.includes("当前标识卡") && !message.includes("Index")) {
+        ElMessage.error(message || "服务异常！");
+      }
       break;
     case 502:
       ElMessage.error("网关错误！");

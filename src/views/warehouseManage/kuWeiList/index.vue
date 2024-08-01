@@ -80,7 +80,7 @@ const getTableList = (params: any) => {
 const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
   { type: "selection", fixed: "left", width: 70 },
   { prop: "locationNo", label: "库位名称", search: { el: "input" } },
-  { prop: "locationDesc", label: "备注" },
+  // { prop: "locationDesc", label: "备注" },
   { prop: "depotName", label: "所属仓库", search: { el: "input" } },
   {
     prop: "depotOwner",

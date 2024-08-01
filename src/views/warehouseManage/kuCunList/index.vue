@@ -139,6 +139,7 @@ const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
   { prop: "createTime", label: "入库时间", width: 180 },
   { prop: "depotName", label: "所在仓库", search: { el: "input" }, width: 100, fixed: "right" },
   { prop: "depotLocationNo", label: "所在库位", search: { el: "input" }, width: 140, fixed: "right" },
+  { prop: "depotLocationDesc", label: "备注", fixed: "right" },
   {
     prop: "materialNum",
     label: "数量",
