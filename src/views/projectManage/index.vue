@@ -84,6 +84,25 @@ const initParam = reactive({});
 // dataCallback 是对于返回的表格数据做处理，如果你后台返回的数据不是 list && total && pageNo && pageSize 这些字段，可以在这里进行处理成这些字段
 // 或者直接去 hooks/useTable.ts 文件中把字段改为你后端对应的就行
 const dataCallback = (data: any) => {
+  // data = {
+  //   items: [
+  //     {
+  //       partNo: "test",
+  //       materialName: "PHEV-1.4T热端后催进气隔热罩左半壳组件",
+  //       materialProject: "test",
+  //       produceDate: "08/04/2024",
+  //       batchNo: "test",
+  //       materialNum: 50,
+  //       shift: "test",
+  //       checker: "test",
+  //       qrBatchQty: null,
+  //       checkDate: "08/04/2024"
+  //     }
+  //   ],
+  //   totalRows: 1,
+  //   pageNo: 1,
+  //   pageSize: 10
+  // };
   data.items.forEach((e: any) => {
     e.visible = false;
   });
@@ -333,12 +352,26 @@ const printFun = async (row: any) => {
     worksheet.getCell(`${startRow + 1}`, 2).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
     worksheet.getCell(`${startRow + 1}`, 2).border = borderStyle;
 
-    worksheet.getCell(`${startRow + 1}`, 3).value = "零件名称\nDescription";
-    worksheet.getCell(`${startRow + 1}`, 3).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
-    worksheet.getCell(`${startRow + 1}`, 3).border = borderStyle;
-    worksheet.getCell(`${startRow + 1}`, 4).value = row.materialName;
-    worksheet.getCell(`${startRow + 1}`, 4).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
-    worksheet.getCell(`${startRow + 1}`, 4).border = borderStyle;
+    // worksheet.getCell(`${startRow + 1}`, 3).value = "零件名称\nDescription";
+    // worksheet.getCell(`${startRow + 1}`, 3).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
+    // worksheet.getCell(`${startRow + 1}`, 3).border = borderStyle;
+    // worksheet.getCell(`${startRow + 1}`, 4).value = row.materialName;
+    // worksheet.getCell(`${startRow + 1}`, 4).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+    // worksheet.getCell(`${startRow + 1}`, 4).border = borderStyle;
+
+    let materialNameRange =
+      worksheet.getCell(`${startRow + 1}`, 3).address + ":" + worksheet.getCell(`${startRow + 2}`, 3).address;
+    worksheet.mergeCells(materialNameRange);
+    worksheet.getCell(materialNameRange).value = "零件名称\nDescription";
+    worksheet.getCell(materialNameRange).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
+    worksheet.getCell(materialNameRange).border = borderStyle;
+
+    let materialNameValRange =
+      worksheet.getCell(`${startRow + 1}`, 4).address + ":" + worksheet.getCell(`${startRow + 2}`, 4).address;
+    worksheet.mergeCells(materialNameValRange);
+    worksheet.getCell(materialNameValRange).value = row.materialName;
+    worksheet.getCell(materialNameValRange).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+    worksheet.getCell(materialNameValRange).border = borderStyle;
 
     worksheet.getCell(`${startRow + 2}`, 1).value = "件号\nPart Number";
     worksheet.getCell(`${startRow + 2}`, 1).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
@@ -347,12 +380,12 @@ const printFun = async (row: any) => {
     worksheet.getCell(`${startRow + 2}`, 2).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
     worksheet.getCell(`${startRow + 2}`, 2).border = borderStyle;
 
-    worksheet.getCell(`${startRow + 2}`, 3).value = "生产日期\nMFD.";
-    worksheet.getCell(`${startRow + 2}`, 3).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
-    worksheet.getCell(`${startRow + 2}`, 3).border = borderStyle;
-    worksheet.getCell(`${startRow + 2}`, 4).value = row.produceDate;
-    worksheet.getCell(`${startRow + 2}`, 4).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
-    worksheet.getCell(`${startRow + 2}`, 4).border = borderStyle;
+    worksheet.getCell(`${startRow + 3}`, 3).value = "生产日期\nMFD.";
+    worksheet.getCell(`${startRow + 3}`, 3).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
+    worksheet.getCell(`${startRow + 3}`, 3).border = borderStyle;
+    worksheet.getCell(`${startRow + 3}`, 4).value = row.produceDate;
+    worksheet.getCell(`${startRow + 3}`, 4).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+    worksheet.getCell(`${startRow + 3}`, 4).border = borderStyle;
 
     worksheet.getCell(`${startRow + 3}`, 1).value = "批次\nBatch NO.";
     worksheet.getCell(`${startRow + 3}`, 1).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
@@ -361,12 +394,12 @@ const printFun = async (row: any) => {
     worksheet.getCell(`${startRow + 3}`, 2).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
     worksheet.getCell(`${startRow + 3}`, 2).border = borderStyle;
 
-    worksheet.getCell(`${startRow + 3}`, 3).value = "数量\nQuantity";
-    worksheet.getCell(`${startRow + 3}`, 3).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
-    worksheet.getCell(`${startRow + 3}`, 3).border = borderStyle;
-    worksheet.getCell(`${startRow + 3}`, 4).value = row.materialNum;
-    worksheet.getCell(`${startRow + 3}`, 4).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
-    worksheet.getCell(`${startRow + 3}`, 4).border = borderStyle;
+    worksheet.getCell(`${startRow + 4}`, 3).value = "数量\nQuantity";
+    worksheet.getCell(`${startRow + 4}`, 3).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
+    worksheet.getCell(`${startRow + 4}`, 3).border = borderStyle;
+    worksheet.getCell(`${startRow + 4}`, 4).value = row.materialNum;
+    worksheet.getCell(`${startRow + 4}`, 4).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+    worksheet.getCell(`${startRow + 4}`, 4).border = borderStyle;
 
     worksheet.getCell(`${startRow + 4}`, 1).value = "班次\nShift";
     worksheet.getCell(`${startRow + 4}`, 1).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
@@ -375,17 +408,24 @@ const printFun = async (row: any) => {
     worksheet.getCell(`${startRow + 4}`, 2).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
     worksheet.getCell(`${startRow + 4}`, 2).border = borderStyle;
 
-    let insDateRange = worksheet.getCell(`${startRow + 4}`, 3).address + ":" + worksheet.getCell(`${startRow + 5}`, 3).address;
-    worksheet.mergeCells(insDateRange);
-    worksheet.getCell(insDateRange).value = "检验日期\nInspection Date";
-    worksheet.getCell(insDateRange).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
-    worksheet.getCell(insDateRange).border = borderStyle;
+    worksheet.getCell(`${startRow + 5}`, 3).value = "检验日期\nInspection Date";
+    worksheet.getCell(`${startRow + 5}`, 3).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
+    worksheet.getCell(`${startRow + 5}`, 3).border = borderStyle;
+    worksheet.getCell(`${startRow + 5}`, 4).value = row.checkDate;
+    worksheet.getCell(`${startRow + 5}`, 4).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+    worksheet.getCell(`${startRow + 5}`, 4).border = borderStyle;
 
-    let insDateValRange = worksheet.getCell(`${startRow + 4}`, 4).address + ":" + worksheet.getCell(`${startRow + 5}`, 4).address;
-    worksheet.mergeCells(insDateValRange);
-    worksheet.getCell(insDateValRange).value = row.checkDate;
-    worksheet.getCell(insDateValRange).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
-    worksheet.getCell(insDateValRange).border = borderStyle;
+    // let insDateRange = worksheet.getCell(`${startRow + 4}`, 3).address + ":" + worksheet.getCell(`${startRow + 5}`, 3).address;
+    // worksheet.mergeCells(insDateRange);
+    // worksheet.getCell(insDateRange).value = "检验日期\nInspection Date";
+    // worksheet.getCell(insDateRange).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
+    // worksheet.getCell(insDateRange).border = borderStyle;
+
+    // let insDateValRange = worksheet.getCell(`${startRow + 4}`, 4).address + ":" + worksheet.getCell(`${startRow + 5}`, 4).address;
+    // worksheet.mergeCells(insDateValRange);
+    // worksheet.getCell(insDateValRange).value = row.checkDate;
+    // worksheet.getCell(insDateValRange).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+    // worksheet.getCell(insDateValRange).border = borderStyle;
 
     worksheet.getCell(`${startRow + 5}`, 1).value = "检验员\nInspector";
     worksheet.getCell(`${startRow + 5}`, 1).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
