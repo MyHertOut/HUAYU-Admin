@@ -11,17 +11,18 @@
     >
       <el-form-item label="件号" prop="partNo">
         <el-select
-          v-model="drawerProps.row!.partNo"
+          v-model.trim="drawerProps.row!.partNo"
           filterable
           allow-create
           default-first-option
           :reserve-keyword="false"
           placeholder="输入查询，未找到的亦可创建"
           clearable
+          :filter-method="filterMethod"
         >
           <el-option
             @click="partNoChange(item)"
-            v-for="(item, key) in drawerProps.materialDicList"
+            v-for="(item, key) in materialDicList"
             :key="key"
             :label="item.partNo"
             :value="item.partNo"
@@ -97,6 +98,11 @@ const isPartNoHave = computed(() => {
     return index !== -1 ? true : false;
   }
 });
+
+const materialDicList: any = ref([]);
+const filterMethod = (value: any) => {
+  materialDicList.value = drawerProps.value.materialDicList.filter((e: any) => e.partNo.includes(value));
+};
 
 const partNoChange = (value: any) => {
   console.log(value);

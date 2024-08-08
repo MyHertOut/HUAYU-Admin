@@ -1,10 +1,13 @@
 <template>
+  <!-- {{ column.search?.key }} {{ handleProp(column.prop!) }} -->
   <component
     :is="column.search?.render ?? `el-${column.search?.el}`"
     v-bind="{ ...handleSearchProps, ...placeholder, searchParam: _searchParam, clearable }"
     v-model.trim="_searchParam[column.search?.key ?? handleProp(column.prop!)]"
     :data="column.search?.el === 'tree-select' ? columnEnum : []"
     :options="['cascader', 'select-v2'].includes(column.search?.el!) ? columnEnum : []"
+    default-first-option
+    :filter-method="handleSearchProps.filterMethod ? filterMethod : null"
   >
     <template v-if="column.search?.el === 'cascader'" #default="{ data }">
       <span>{{ data[fieldNames.label] }}</span>
@@ -12,7 +15,7 @@
     <template v-if="column.search?.el === 'select'">
       <component
         :is="`el-option`"
-        v-for="(col, index) in columnEnum"
+        v-for="(col, index) in handleSearchProps.filterMethod ? filterList : columnEnum"
         :key="index"
         :label="col[fieldNames.label]"
         :value="col[fieldNames.value]"
@@ -47,7 +50,7 @@ const fieldNames = computed(() => {
 
 // 接收 enumMap (el 为 select-v2 需单独处理 enumData)
 const enumMap = inject("enumMap", ref(new Map()));
-const columnEnum = computed(() => {
+let columnEnum = computed(() => {
   let enumData = enumMap.value.get(props.column.prop);
   if (!enumData) return [];
   if (props.column.search?.el === "select-v2" && props.column.fieldNames) {
@@ -93,4 +96,11 @@ const clearable = computed(() => {
   const search = props.column.search;
   return search?.props?.clearable ?? (search?.defaultValue == null || search?.defaultValue == undefined);
 });
+
+let filterList: any = ref([]);
+const filterMethod = (value: any) => {
+  filterList.value = columnEnum.value.filter((e: any) =>
+    e[props.column.search?.key ?? handleProp(props.column.prop!)].includes(value)
+  );
+};
 </script>
