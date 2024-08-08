@@ -29,7 +29,7 @@
       <!-- 表格操作 -->
       <template #operation="scope">
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
-        <el-button type="primary" v-if="false" link :icon="Delete" @click="deleteFun(scope.row)">删除</el-button>
+        <el-button type="primary" link :icon="Delete" @click="deleteFun(scope.row)">删除</el-button>
       </template>
     </ProTable>
     <Drawer ref="drawerRef" />
@@ -104,6 +104,7 @@ const columns = reactive<ColumnProps<any>[]>([
   { prop: "qrSerialNo", label: "编号" },
   { prop: "materialName", label: "零件名称", search: { el: "input" }, width: 120 },
   { prop: "materialProject", label: "项目名称", width: 120 },
+  { prop: "batchNo", label: "批次", width: 120 },
   {
     prop: "materialNum",
     label: "数量",
@@ -137,7 +138,7 @@ const downloadFile = async () => {
 
 // 删除记录
 const deleteFun = async (params: any) => {
-  await useHandleData(delDepotRecord, { ids: [params.id] }, `删除【${params.depotName}】记录`);
+  await useHandleData(delDepotRecord, { ids: [params.id] }, `删除【${params.qrSerialNo}】记录`);
   proTable.value?.getTableList();
 };
 

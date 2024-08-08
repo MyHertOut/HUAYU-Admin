@@ -295,7 +295,7 @@ export function filterEnum(callValue: any, enumData?: any, fieldNames?: FieldNam
   if (type == "tag") {
     return filterData?.tagType ? filterData.tagType : "";
   } else {
-    return filterData ? filterData[label] : "--";
+    return filterData ? filterData[label] : callValue;
   }
 }
 
