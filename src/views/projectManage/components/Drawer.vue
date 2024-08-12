@@ -70,7 +70,12 @@
         <el-input v-model="drawerProps.row!.checker" placeholder="请输入检验员" clearable></el-input>
       </el-form-item>
       <el-form-item label="检验日期" prop="checkDate">
-        <el-input v-model="drawerProps.row!.checkDate" placeholder="默认当天" clearable disabled></el-input>
+        <el-input
+          v-model="drawerProps.row!.checkDate"
+          placeholder="默认当天"
+          clearable
+          :disabled="isProduceDateDisabled"
+        ></el-input>
       </el-form-item>
       <el-form-item label="所属单位" prop="materialBelongTo">
         <el-input v-model="drawerProps.row!.materialBelongTo" placeholder="请输入所属单位" clearable></el-input>
