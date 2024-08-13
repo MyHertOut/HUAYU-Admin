@@ -79,8 +79,8 @@ const dataCallback = (data: any) => {
 // 默认不做操作就直接在 ProTable 组件上绑定	:requestApi="getMaterialDicList"
 const getTableList = (params: any) => {
   let newParams = JSON.parse(JSON.stringify(params));
-  newParams.createTime && (newParams.startTime = newParams.createTime[0]);
-  newParams.createTime && (newParams.endTime = newParams.createTime[1]);
+  newParams.createTime && (newParams.startDate = newParams.createTime[0]);
+  newParams.createTime && (newParams.endDate = newParams.createTime[1]);
   delete newParams.createTime;
   return getMaterialDicList(newParams);
 };
