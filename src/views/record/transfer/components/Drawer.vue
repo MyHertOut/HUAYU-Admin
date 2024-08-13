@@ -127,7 +127,7 @@ const acceptParams = (params: DrawerProps) => {
           drawerProps.value.row[k] = moment(drawerProps.value.row[k]).format("M/D/YYYY");
         }
         if (k === "createTime") {
-          drawerProps.value.row[k] = moment(drawerProps.value.row[k]).format("YYYY-MM-DD hh:mm:ss");
+          drawerProps.value.row[k] = moment(drawerProps.value.row[k]).format("YYYY-MM-DD HH:mm:ss");
         }
       }
     }

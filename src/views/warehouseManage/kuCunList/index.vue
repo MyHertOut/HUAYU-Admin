@@ -18,7 +18,7 @@
       </template>
       <template #produceDate="scope"> {{ moment(scope.row.produceDate).format("M/D/YYYY") }} </template>
       <template #checkDate="scope"> {{ moment(scope.row.checkDate).format("M/D/YYYY") }} </template>
-      <template #createTime="scope"> {{ moment(scope.row.createTime).format("YYYY-MM-DD hh:mm:ss") }} </template>
+      <template #createTime="scope"> {{ moment(scope.row.createTime).format("YYYY-MM-DD HH:mm:ss") }} </template>
       <template #depotLocationNo="scope">
         <span v-if="!scope.row.isTransfer">{{ scope.row.depotLocationNo }}</span>
         <el-select

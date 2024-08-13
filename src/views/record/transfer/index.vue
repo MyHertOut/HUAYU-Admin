@@ -25,7 +25,7 @@
       <template #materialNumHeader="scope">
         <span style="font-size: 16px; font-weight: bolder; color: var(--el-color-primary)"> {{ scope.column.label }}</span>
       </template>
-      <template #createTime="scope"> {{ moment(scope.row.createTime).format("YYYY-MM-DD hh:mm:ss") }} </template>
+      <template #createTime="scope"> {{ moment(scope.row.createTime).format("YYYY-MM-DD HH:mm:ss") }} </template>
       <!-- 表格操作 -->
       <template #operation="scope">
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
@@ -117,7 +117,17 @@ const columns = reactive<ColumnProps<any>[]>([
   { prop: "sourceLocationNo", label: "来源库位", width: 160 },
   { prop: "targetDepotName", label: "目标仓库", search: { el: "input" }, width: 160 },
   { prop: "targetLocationNo", label: "目标库位", width: 160 },
-  { prop: "createTime", label: "转库时间", width: 180 },
+  {
+    prop: "createTime",
+    label: "转库时间",
+    width: 180,
+    search: {
+      el: "date-picker",
+      span: 2,
+      props: { type: "daterange", valueFormat: "YYYY-MM-DD" },
+      defaultValue: []
+    }
+  },
   { prop: "operatorName", label: "转库人", width: 180 },
   { prop: "targetLocationDescribe", label: "备注", width: 180 },
   { prop: "operation", label: "操作", fixed: "right", width: 220 }
@@ -132,7 +142,7 @@ const sortTable = ({ newIndex, oldIndex }: { newIndex?: number; oldIndex?: numbe
 
 const downloadFile = async () => {
   ElMessageBox.confirm("确认导出数据?", "温馨提示", { type: "warning" }).then(() =>
-    useDownload(exportDepotRecord, "转库记录列表", proTable.value?.searchParam)
+    useDownload(exportDepotRecord, "转库记录列表", { operateType: 3, ...proTable.value?.searchParam })
   );
 };
 

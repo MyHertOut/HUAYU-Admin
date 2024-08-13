@@ -19,8 +19,8 @@
       </template>
       <template #produceDate="scope"> {{ moment(scope.row.produceDate).format("M/D/YYYY") }} </template>
       <template #checkDate="scope"> {{ moment(scope.row.checkDate).format("M/D/YYYY") }} </template>
-      <template #createTime="scope"> {{ moment(scope.row.createTime).format("YYYY-MM-DD hh:mm:ss") }} </template>
-      <template #updateTime="scope"> {{ moment(scope.row.updateTime).format("YYYY-MM-DD hh:mm:ss") }} </template>
+      <template #createTime="scope"> {{ moment(scope.row.createTime).format("YYYY-MM-DD HH:mm:ss") }} </template>
+      <template #updateTime="scope"> {{ moment(scope.row.updateTime).format("YYYY-MM-DD HH:mm:ss") }} </template>
       <!-- 表格操作 -->
       <template #operation="scope">
         <el-popover :visible="scope.row.visible" placement="top" :width="195">
@@ -245,6 +245,28 @@ const printFun = async (row: any) => {
   // 创建一个新的工作簿
   const workbook: any = new ExcelJS.Workbook();
   const worksheet: any = workbook.addWorksheet("Material Label");
+
+  // worksheet.pageSetup.margins = {
+  //   left: 0.5,
+  //   right: 0.5,
+  //   top: 0.5,
+  //   bottom: 0.5,
+  //   header: 0.5,
+  //   footer: 0.5
+  // };
+  // worksheet.pageSetup.horizontalCentered = true;
+  // worksheet.pageSetup.verticalCentered = true;
+
+  // // 设置纸张大小为 10cm * 10cm（约等于 3.94 英寸）
+  // worksheet.pageSetup.paperSize = 9; // ExcelJS 预定义纸张大小编号
+  // worksheet.pageSetup.fitToPage = true;
+
+  // // 自定义纸张大小（英寸为单位）
+  // worksheet.pageSetup.pageWidth = 3.94;
+  // worksheet.pageSetup.pageHeight = 3.94;
+
+  // // 设置缩放比例为 55%
+  // worksheet.pageSetup.scale = 55;
 
   const globalFontStyle = { bold: true, color: { argb: "000000" }, name: "Arial", family: 2, size: 16 };
 
