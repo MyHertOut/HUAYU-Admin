@@ -18,7 +18,7 @@
       </template>
       <template #produceDate="scope"> {{ moment(scope.row.produceDate).format("M/D/YYYY") }} </template>
       <template #checkDate="scope"> {{ moment(scope.row.checkDate).format("M/D/YYYY") }} </template>
-      <template #createTime="scope"> {{ moment(scope.row.createTime).format("YYYY-MM-DD HH:mm:ss") }} </template>
+      <template #updateTime="scope"> {{ moment(scope.row.updateTime).format("YYYY-MM-DD HH:mm:ss") }}</template>
       <template #depotLocationNo="scope">
         <span v-if="!scope.row.isTransfer">{{ scope.row.depotLocationNo }}</span>
         <el-select
@@ -136,7 +136,7 @@ const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
     },
     width: 100
   },
-  { prop: "createTime", label: "入库时间", width: 180 },
+  { prop: "updateTime", label: "操作时间", width: 180 },
   { prop: "depotName", label: "所在仓库", search: { el: "input" }, width: 100, fixed: "right" },
   { prop: "depotLocationNo", label: "所在库位", search: { el: "input" }, width: 140, fixed: "right" },
   { prop: "depotLocationDesc", label: "备注", fixed: "right" },
