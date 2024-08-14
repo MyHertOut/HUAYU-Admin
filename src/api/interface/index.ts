@@ -115,6 +115,7 @@ export namespace Project {
     qrBatchQty: any;
     qrBatchNo: any;
     materialBelongTo: string;
+    creatorId: number;
   }
 }
 

@@ -74,6 +74,7 @@ import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import QRCode from "qrcode";
 import { base64Logo } from "./data";
+import { findUserList } from "@/api/modules/user";
 
 // ProTable 实例
 const proTable = ref<ProTableInstance>();
@@ -134,6 +135,26 @@ const GetMaterialDicList = async () => {
 };
 GetMaterialDicList();
 
+const userList: any = ref([]);
+const GetUserList = async () => {
+  userList.value = [];
+  let res: any = await findUserList();
+  if (res.code === "200") {
+    userList.value = res.data;
+    console.log(userList.value);
+  }
+};
+GetUserList();
+
+const dealName = val => {
+  let text = "";
+  let item = userList.value.filter(e => e.id == val)[0];
+  if (item) {
+    text += `${item.username}(${item.phoneNum}) `;
+  }
+  return text;
+};
+
 // 页面按钮权限（按钮权限既可以使用 hooks，也可以直接使用 v-auth 指令，指令适合直接绑定在按钮上，hooks 适合根据按钮权限显示不同的内容）
 
 // 表格配置项
@@ -158,6 +179,14 @@ const columns = reactive<ColumnProps<Project.ResProjectList>[]>([
   { prop: "checkDate", label: "检验日期", width: 100 },
   { prop: "createTime", label: "创建时间", width: 180 },
   { prop: "updateTime", label: "更新时间", width: 180 },
+  {
+    prop: "creatorId",
+    label: "创建人",
+    render: scope => {
+      return <>{dealName(scope.row.creatorId)}</>;
+    },
+    width: 180
+  },
   { prop: "operation", label: "操作", fixed: "right", width: 280 }
 ]);
 
