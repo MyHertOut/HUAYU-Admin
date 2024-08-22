@@ -297,7 +297,7 @@ const printFun = async (row: any) => {
   // // 设置缩放比例为 55%
   // worksheet.pageSetup.scale = 55;
 
-  const globalFontStyle = { bold: true, color: { argb: "000000" }, name: "Arial", family: 2, size: 16 };
+  const globalFontStyle = { bold: true, color: { argb: "000000" }, name: "Arial", family: 2, size: 20 };
 
   const borderStyle = {
     top: { style: "medium" },
