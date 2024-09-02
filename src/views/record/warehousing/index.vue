@@ -92,7 +92,7 @@ GetMaterialDicList();
 // 表格配置项
 // sourceDepotId/targetDepotId/materialId/qrBatchNo/qrSerialNo/operateType/materialIds/depotOwner/partNo/operatorId/depotName/depotId/materialName/materialProject/materialBelongTo
 const columns = reactive<ColumnProps<any>[]>([
-  { type: "selection", fixed: "left", width: 70 },
+  // { type: "selection", fixed: "left", width: 70 },
   {
     prop: "partNo",
     label: "件号",
@@ -140,8 +140,20 @@ const sortTable = ({ newIndex, oldIndex }: { newIndex?: number; oldIndex?: numbe
 
 const downloadFile = async () => {
   ElMessageBox.confirm("确认导出数据?", "温馨提示", { type: "warning" }).then(() => {
-    console.log(proTable.value?.searchParam);
-    useDownload(exportDepotRecord, "入库记录列表", { operateType: 1, ...proTable.value?.searchParam });
+    let startDate: any = "";
+    let endDate: any = "";
+    if (proTable.value?.searchParam.createTime.length) {
+      startDate = proTable.value?.searchParam.createTime[0];
+      endDate = proTable.value?.searchParam.createTime[1];
+      useDownload(exportDepotRecord, "入库记录列表", {
+        operateType: 1,
+        startDate: startDate,
+        endDate: endDate,
+        ...proTable.value?.searchParam
+      });
+    } else {
+      useDownload(exportDepotRecord, "入库记录列表", { operateType: 1, ...proTable.value?.searchParam });
+    }
   });
 };
 
