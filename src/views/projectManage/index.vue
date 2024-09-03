@@ -39,6 +39,7 @@
         </el-popover>
         <el-button type="primary" link :icon="EditPen" @click="openDrawer('复制', scope.row)">复制</el-button>
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
+        <el-button type="primary" link :icon="Download" @click="downloadACopy(scope.row)">下载副本</el-button>
         <el-button type="primary" link :icon="Delete" @click="deleteFun(scope.row)">删除</el-button>
       </template>
     </ProTable>
@@ -187,7 +188,7 @@ const columns = reactive<ColumnProps<Project.ResProjectList>[]>([
     },
     width: 180
   },
-  { prop: "operation", label: "操作", fixed: "right", width: 280 }
+  { prop: "operation", label: "操作", fixed: "right", width: 310 }
 ]);
 
 // 表格拖拽排序
@@ -267,10 +268,15 @@ const printPreFun = async (row: any) => {
     printFun(row);
   }, 1000);
 };
+
+const downloadACopy = (row: any) => {
+  printFun(row, "downloadACopy");
+};
+
 // 打印
 const qrCanvas: any = ref(null);
 let base64Image: any = ref(null);
-const printFun = async (row: any) => {
+const printFun = async (row: any, type?: string) => {
   // 创建一个新的工作簿
   const workbook: any = new ExcelJS.Workbook();
   const worksheet: any = workbook.addWorksheet("Material Label");
@@ -305,7 +311,7 @@ const printFun = async (row: any) => {
     bottom: { style: "medium" },
     right: { style: "medium" }
   };
-  let printDate = moment(new Date()).format("YYYYMMDDHHMMSS");
+  let printDate = type ? moment(new Date(row.updateTime)).format("YYYYMMDDHHmmss") : moment(new Date()).format("YYYYMMDDHHmmss");
   for (let i = 0; i < row.qrBatchQty; i++) {
     // 设置列宽和行高
     worksheet.getColumn(1).width = 18.69;
@@ -501,6 +507,7 @@ const printFun = async (row: any) => {
   saveAs(blob, `标识卡打印${printDate}.xlsx`);
   printLoading.value = false;
   printNum.value = "";
+  proTable.value?.getTableList();
 };
 
 const generateQRCodeWithBorder = async (text: any) => {
