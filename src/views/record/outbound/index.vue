@@ -11,14 +11,7 @@
       <!-- 表格 header 按钮 -->
       <template #tableHeader="scope">
         <el-button type="primary" :icon="Download" plain @click="downloadFile">导出数据</el-button>
-        <el-button
-          type="danger"
-          v-if="false"
-          :icon="Delete"
-          plain
-          :disabled="!scope.isSelected"
-          @click="batchDelete(scope.selectedListIds)"
-        >
+        <el-button type="danger" :icon="Delete" plain :disabled="!scope.isSelected" @click="batchDelete(scope.selectedListIds)">
           批量删除
         </el-button>
       </template>
@@ -92,7 +85,7 @@ GetMaterialDicList();
 
 // 表格配置项
 const columns = reactive<ColumnProps<any>[]>([
-  // { type: "selection", fixed: "left", width: 70 },
+  { type: "selection", fixed: "left", width: 70 },
   {
     prop: "partNo",
     label: "件号",
