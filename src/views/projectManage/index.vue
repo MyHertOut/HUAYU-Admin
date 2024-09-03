@@ -39,7 +39,29 @@
         </el-popover>
         <el-button type="primary" link :icon="EditPen" @click="openDrawer('复制', scope.row)">复制</el-button>
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
-        <el-button type="primary" link :icon="Download" @click="downloadACopy(scope.row)">下载副本</el-button>
+
+        <!-- <el-popover :visible="scope.row.downloadVisible" placement="top" :width="225">
+          <div>
+            <div style="margin-bottom: 5px; font-size: 12px">
+              Tips:【已在库中，但是Excel丢失，请到库存列表中找到对应编号前缀】【仅针对老数据】
+            </div>
+            <el-input v-model.number="printNum" style="width: 200px" placeholder="请输入编号前缀" />
+            <div style="margin: 15px 0 0; text-align: right">
+              <el-button size="small" text @click="(scope.row.downloadVisible = false), (printNum = '')">取消</el-button>
+              <el-button size="small" type="primary" @click="downloadACopy(scope.row)"> 确定 </el-button>
+            </div>
+          </div>
+          <template #reference>
+            <el-button type="primary" v-if="scope.row.qrBatchQty" link :icon="Download" @click="scope.row.downloadVisible = true">
+              下载副本
+            </el-button>
+          </template>
+        </el-popover> -->
+
+        <el-button type="primary" v-if="scope.row.qrBatchQty" link :icon="Download" @click="downloadACopy(scope.row)">
+          下载副本
+        </el-button>
+
         <el-button type="primary" link :icon="Delete" @click="deleteFun(scope.row)">删除</el-button>
       </template>
     </ProTable>
@@ -54,7 +76,7 @@ import { ref, reactive } from "vue";
 import { Project } from "@/api/interface";
 import { useHandleData } from "@/hooks/useHandleData";
 import { useDownload } from "@/hooks/useDownload";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ElMessage, ElMessageBox, ElNotification } from "element-plus";
 import ProTable from "@/components/ProTable/index.vue";
 import ImportExcel from "@/components/ImportExcel/index.vue";
 import Drawer from "./components/Drawer.vue";
@@ -107,6 +129,7 @@ const dataCallback = (data: any) => {
   // };
   data.items.forEach((e: any) => {
     e.visible = false;
+    // e.downloadVisible;
   });
   return {
     list: data.items,
@@ -263,20 +286,31 @@ const printPreFun = async (row: any) => {
   row.visible = false;
   printLoading.value = true;
   row.qrBatchQty = printNum.value;
-  await editProject(row);
-  setTimeout(() => {
-    printFun(row);
-  }, 1000);
+  let res: any = await editProject(row);
+  if (res.code === "200") {
+    let date = moment(new Date(row.createTime)).format("YYYYMMDDHHmmss");
+    setTimeout(() => {
+      printFun(row, date);
+    }, 1000);
+  }
 };
 
 const downloadACopy = (row: any) => {
-  printFun(row, "downloadACopy");
+  printLoading.value = true;
+  ElNotification({
+    title: "温馨提示",
+    message: "如果数据庞大会导致下载缓慢哦，请您耐心等待！",
+    type: "info",
+    duration: 1000
+  });
+  let date = moment(new Date(row.createTime)).format("YYYYMMDDHHmmss");
+  printFun(row, date);
 };
 
 // 打印
 const qrCanvas: any = ref(null);
 let base64Image: any = ref(null);
-const printFun = async (row: any, type?: string) => {
+const printFun = async (row: any, date?: string) => {
   // 创建一个新的工作簿
   const workbook: any = new ExcelJS.Workbook();
   const worksheet: any = workbook.addWorksheet("Material Label");
@@ -311,7 +345,7 @@ const printFun = async (row: any, type?: string) => {
     bottom: { style: "medium" },
     right: { style: "medium" }
   };
-  let printDate = type ? moment(new Date(row.updateTime)).format("YYYYMMDDHHmmss") : moment(new Date()).format("YYYYMMDDHHmmss");
+  let printDate = date;
   for (let i = 0; i < row.qrBatchQty; i++) {
     // 设置列宽和行高
     worksheet.getColumn(1).width = 18.69;
