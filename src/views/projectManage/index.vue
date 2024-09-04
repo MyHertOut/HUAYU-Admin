@@ -40,14 +40,14 @@
         <el-button type="primary" link :icon="EditPen" @click="openDrawer('复制', scope.row)">复制</el-button>
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
 
-        <!-- <el-popover :visible="scope.row.downloadVisible" placement="top" :width="225">
+        <el-popover :visible="scope.row.downloadVisible" placement="top" :width="225">
           <div>
-            <div style="margin-bottom: 5px; font-size: 12px">
+            <div style="margin-bottom: 5px; font-size: 12px; color: red">
               Tips:【已在库中，但是Excel丢失，请到库存列表中找到对应编号前缀】【仅针对老数据】
             </div>
-            <el-input v-model.number="printNum" style="width: 200px" placeholder="请输入编号前缀" />
+            <el-input v-model="printDate" style="width: 200px" placeholder="请输入编号前缀" />
             <div style="margin: 15px 0 0; text-align: right">
-              <el-button size="small" text @click="(scope.row.downloadVisible = false), (printNum = '')">取消</el-button>
+              <el-button size="small" text @click="(scope.row.downloadVisible = false), (printDate = '')">取消</el-button>
               <el-button size="small" type="primary" @click="downloadACopy(scope.row)"> 确定 </el-button>
             </div>
           </div>
@@ -56,11 +56,11 @@
               下载副本
             </el-button>
           </template>
-        </el-popover> -->
+        </el-popover>
 
-        <el-button type="primary" v-if="scope.row.qrBatchQty" link :icon="Download" @click="downloadACopy(scope.row)">
+        <!-- <el-button type="primary" v-if="scope.row.qrBatchQty" link :icon="Download" @click="downloadACopy(scope.row)">
           下载副本
-        </el-button>
+        </el-button> -->
 
         <el-button type="primary" link :icon="Delete" @click="deleteFun(scope.row)">删除</el-button>
       </template>
@@ -129,7 +129,7 @@ const dataCallback = (data: any) => {
   // };
   data.items.forEach((e: any) => {
     e.visible = false;
-    // e.downloadVisible;
+    e.downloadVisible = false;
   });
   return {
     list: data.items,
@@ -279,6 +279,7 @@ const base64ToUint8Array = (base64: string): Uint8Array => {
 
 let printLoading: any = ref(false);
 let printNum: any = ref();
+let printDate: any = ref();
 const printPreFun = async (row: any) => {
   if (!printNum.value) {
     return;
@@ -296,6 +297,7 @@ const printPreFun = async (row: any) => {
 };
 
 const downloadACopy = (row: any) => {
+  console.log(row, printDate);
   printLoading.value = true;
   ElNotification({
     title: "温馨提示",
@@ -303,8 +305,9 @@ const downloadACopy = (row: any) => {
     type: "info",
     duration: 1000
   });
-  let date = moment(new Date(row.createTime)).format("YYYYMMDDHHmmss");
+  let date = printDate.value ? printDate.value : moment(new Date(row.createTime)).format("YYYYMMDDHHmmss");
   printFun(row, date);
+  printDate.value = "";
 };
 
 // 打印
