@@ -202,7 +202,6 @@ const save = async (scope: any) => {
   console.log("数据id:", scope.row.id);
   console.log("原始库位:", scope.row.depotLocationId);
   console.log("指向库位:", depotLocationId.value);
-  return;
   await updateMaterialLocation({
     id: scope.row.id,
     depotLocationId: depotLocationId.value
