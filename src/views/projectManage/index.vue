@@ -43,7 +43,7 @@
         <el-popover :visible="scope.row.downloadVisible" placement="top" :width="225">
           <div>
             <div style="margin-bottom: 5px; font-size: 12px; color: red">
-              Tips:【已在库中，但是Excel丢失，请到库存列表中找到对应编号前缀】【仅针对老数据】
+              Tips:【已在库中，但是Excel丢失，请到库存列表中找到对应数据的编号前缀以及Id】【仅针对老数据】
             </div>
             <el-input v-model="printDate" style="width: 200px" placeholder="请输入编号前缀" />
             <div style="margin: 15px 0 0; text-align: right">
@@ -184,6 +184,7 @@ const dealName = val => {
 // 表格配置项
 const columns = reactive<ColumnProps<Project.ResProjectList>[]>([
   { type: "selection", fixed: "left", width: 70 },
+  { prop: "id", label: "Id", width: 100 },
   {
     prop: "partNo",
     label: "件号",

@@ -112,6 +112,7 @@ const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
   //   },
   //   fixed: "left"
   // },
+  { prop: "materialId", label: "Id", width: 100 },
   { prop: "qrSerialNo", label: "编号", search: { el: "input" }, width: 160, fixed: "left" },
   {
     prop: "partNo",
