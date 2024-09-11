@@ -55,6 +55,7 @@ export namespace User {
     address: string;
     createTime: string[];
     userStatus: number;
+    roleId: any;
   }
   export interface ResUserList {
     id: string;

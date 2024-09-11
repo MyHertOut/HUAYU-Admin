@@ -61,8 +61,7 @@
         <!-- <el-button type="primary" v-if="scope.row.qrBatchQty" link :icon="Download" @click="downloadACopy(scope.row)">
           下载副本
         </el-button> -->
-
-        <el-button type="primary" link :icon="Delete" @click="deleteFun(scope.row)">删除</el-button>
+        <el-button v-if="isAdmin" type="primary" link :icon="Delete" @click="deleteFun(scope.row)">删除</el-button>
       </template>
     </ProTable>
     <Drawer ref="drawerRef" />
@@ -72,7 +71,7 @@
 </template>
 
 <script setup lang="tsx" name="projectManage">
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { Project } from "@/api/interface";
 import { useHandleData } from "@/hooks/useHandleData";
 import { useDownload } from "@/hooks/useDownload";
@@ -82,6 +81,7 @@ import ImportExcel from "@/components/ImportExcel/index.vue";
 import Drawer from "./components/Drawer.vue";
 import { ProTableInstance, ColumnProps } from "@/components/ProTable/interface";
 import { CirclePlus, Delete, EditPen, View, Printer, Upload, Download } from "@element-plus/icons-vue";
+import { getUserList } from "@/api/modules/user";
 import {
   getProjectList,
   addProject,
@@ -98,6 +98,21 @@ import { saveAs } from "file-saver";
 import QRCode from "qrcode";
 import { base64Logo } from "./data";
 import { findUserList } from "@/api/modules/user";
+
+const isAdmin: any = ref(false);
+const getAdmin = async () => {
+  let res: any = await getUserList({
+    username: JSON.parse(localStorage["huaYu-user"]).userInfo.username
+  } as any);
+  if (res.code === "200") {
+    if (res.data.items.length) {
+      isAdmin.value = true;
+    }
+  }
+};
+onMounted(() => {
+  getAdmin();
+});
 
 // ProTable 实例
 const proTable = ref<ProTableInstance>();
@@ -165,7 +180,6 @@ const GetUserList = async () => {
   let res: any = await findUserList();
   if (res.code === "200") {
     userList.value = res.data;
-    console.log(userList.value);
   }
 };
 GetUserList();
@@ -473,6 +487,7 @@ const printFun = async (row: any, date?: string) => {
     worksheet.getCell(`${startRow + 2}`, 1).border = borderStyle;
     worksheet.getCell(`${startRow + 2}`, 2).value = row.partNo;
     worksheet.getCell(`${startRow + 2}`, 2).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+    worksheet.getCell(`${startRow + 2}`, 2).font = { bold: true, color: { argb: "000000" }, name: "Arial", family: 2, size: 22 };
     worksheet.getCell(`${startRow + 2}`, 2).border = borderStyle;
 
     worksheet.getCell(`${startRow + 3}`, 3).value = "生产日期\nMFD.";
@@ -494,6 +509,7 @@ const printFun = async (row: any, date?: string) => {
     worksheet.getCell(`${startRow + 4}`, 3).border = borderStyle;
     worksheet.getCell(`${startRow + 4}`, 4).value = row.materialNum;
     worksheet.getCell(`${startRow + 4}`, 4).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+    worksheet.getCell(`${startRow + 4}`, 4).font = { bold: true, color: { argb: "000000" }, name: "Arial", family: 2, size: 22 };
     worksheet.getCell(`${startRow + 4}`, 4).border = borderStyle;
 
     worksheet.getCell(`${startRow + 4}`, 1).value = "班次\nShift";
