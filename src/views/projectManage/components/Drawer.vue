@@ -77,8 +77,8 @@
           :disabled="isProduceDateDisabled"
         ></el-input>
       </el-form-item>
-      <el-form-item label="备注" prop="materialBelongTo">
-        <el-input v-model="drawerProps.row!.materialBelongTo" placeholder="请输入备注" clearable></el-input>
+      <el-form-item label="备注" prop="remark">
+        <el-input v-model="drawerProps.row!.remark" placeholder="请输入备注" clearable></el-input>
       </el-form-item>
     </el-form>
     <template #footer>

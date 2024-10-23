@@ -216,6 +216,7 @@ const columns = reactive<ColumnProps<Project.ResProjectList>[]>([
   { prop: "checker", label: "检验员" },
   { prop: "qrBatchQty", label: "打印数量", width: 100 },
   { prop: "checkDate", label: "检验日期", width: 100 },
+  { prop: "remark", label: "备注", width: 100 },
   { prop: "createTime", label: "创建时间", width: 180 },
   { prop: "updateTime", label: "更新时间", width: 180 },
   {
