@@ -147,13 +147,21 @@ const isProduceDateDisabled = computed(() => {
 
 // 接收父组件传过来的参数
 const acceptParams = (params: DrawerProps) => {
+  console.log(drawerProps.value.title);
   drawerProps.value = params;
   if (drawerProps.value.title === "新增" || drawerProps.value.title === "复制") {
     drawerProps.value.row.produceDate = moment(new Date()).format("M/D/YYYY");
     drawerProps.value.row.checkDate = moment(new Date()).format("M/D/YYYY");
+    if (drawerProps.value.row.materialBelongTo) {
+      drawerProps.value.row.remark = drawerProps.value.row.materialBelongTo;
+    }
   } else if (drawerProps.value.title === "编辑") {
     drawerProps.value.row.produceDate = moment(drawerProps.value.row.produceDate).format("M/D/YYYY");
     drawerProps.value.row.checkDate = moment(drawerProps.value.row.checkDate).format("M/D/YYYY");
+  } else if (drawerProps.value.title === "查看") {
+    if (drawerProps.value.row.materialBelongTo) {
+      drawerProps.value.row.remark = drawerProps.value.row.materialBelongTo;
+    }
   }
   drawerVisible.value = true;
 };

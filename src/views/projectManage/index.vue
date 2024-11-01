@@ -21,6 +21,7 @@
       <template #checkDate="scope"> {{ moment(scope.row.checkDate).format("M/D/YYYY") }} </template>
       <template #createTime="scope"> {{ moment(scope.row.createTime).format("YYYY-MM-DD HH:mm:ss") }} </template>
       <template #updateTime="scope"> {{ moment(scope.row.updateTime).format("YYYY-MM-DD HH:mm:ss") }} </template>
+      <template #remark="scope"> {{ scope.row.remark || scope.row.materialBelongTo || "-" }} </template>
       <!-- 表格操作 -->
       <template #operation="scope">
         <el-popover :visible="scope.row.visible" placement="top" :width="195">
