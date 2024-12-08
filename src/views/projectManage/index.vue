@@ -47,7 +47,15 @@
             </el-button>
           </template>
         </el-popover>
-        <el-button type="primary" link :icon="CopyDocument" @click="openDrawer('复制', scope.row)">复制</el-button>
+        <el-button
+          type="primary"
+          link
+          :icon="CopyDocument"
+          v-if="!scope.row.traceCodeOpen"
+          @click="openDrawer('复制', scope.row)"
+        >
+          复制
+        </el-button>
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
 
         <el-popover :visible="scope.row.downloadVisible" placement="top" :width="225">
@@ -62,7 +70,13 @@
             </div>
           </div>
           <template #reference>
-            <el-button type="primary" v-if="scope.row.qrBatchQty" link :icon="Download" @click="scope.row.downloadVisible = true">
+            <el-button
+              type="primary"
+              v-if="scope.row.qrBatchQty && !scope.row.traceCodeOpen"
+              link
+              :icon="Download"
+              @click="scope.row.downloadVisible = true"
+            >
               下载副本
             </el-button>
           </template>
