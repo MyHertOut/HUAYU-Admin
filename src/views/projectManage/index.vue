@@ -70,21 +70,13 @@
             </div>
           </div>
           <template #reference>
-            <el-button
-              type="primary"
-              v-if="scope.row.qrBatchQty && !scope.row.traceCodeOpen"
-              link
-              :icon="Download"
-              @click="scope.row.downloadVisible = true"
-            >
+            <!-- && !scope.row.traceCodeOpen -->
+            <el-button type="primary" v-if="scope.row.qrBatchQty" link :icon="Download" @click="scope.row.downloadVisible = true">
               下载副本
             </el-button>
           </template>
         </el-popover>
 
-        <!-- <el-button type="primary" v-if="scope.row.qrBatchQty" link :icon="Download" @click="downloadACopy(scope.row)">
-          下载副本
-        </el-button> -->
         <el-button v-if="isAdmin" type="primary" link :icon="Delete" @click="deleteFun(scope.row)">删除</el-button>
       </template>
     </ProTable>
@@ -423,6 +415,7 @@ const printPreFun = async (row: any) => {
   row.visible = false;
   printLoading.value = true;
   row.qrBatchQty = printNum.value;
+  row.printedQty = printNum.value;
   let res: any = await editProject(row);
   if (res.code === "200") {
     let date = moment(new Date(row.createTime)).format("YYYYMMDDHHmmss");
@@ -433,6 +426,7 @@ const printPreFun = async (row: any) => {
 };
 
 const downloadACopy = (row: any) => {
+  console.log(row, "row");
   printLoading.value = true;
   ElNotification({
     title: "温馨提示",
@@ -441,7 +435,11 @@ const downloadACopy = (row: any) => {
     duration: 1000
   });
   let date = printDate.value ? printDate.value : moment(new Date(row.createTime)).format("YYYYMMDDHHmmss");
-  printFun(row, date);
+  if (row.traceCodeOpen && row.printedQty) {
+    printFun(row, date, row.printedQty - row.qrBatchQty);
+  } else {
+    printFun(row, date);
+  }
   printDate.value = "";
 };
 

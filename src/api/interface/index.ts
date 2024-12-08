@@ -124,6 +124,7 @@ export namespace Project {
     manufacturerCode: any;
     printSecQty: number;
     isPrintSec: boolean;
+    printedQty: any;
   }
 }
 

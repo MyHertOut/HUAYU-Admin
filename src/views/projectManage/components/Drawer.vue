@@ -173,6 +173,7 @@ const isProduceDateDisabled = computed(() => {
 // 接收父组件传过来的参数
 const acceptParams = (params: DrawerProps) => {
   drawerProps.value = params;
+  console.log(drawerProps.value, "drawerProps.value");
   if (drawerProps.value.title === "新增" || drawerProps.value.title === "复制") {
     drawerProps.value.row.produceDate = moment(new Date()).format("M/D/YYYY");
     drawerProps.value.row.checkDate = moment(new Date()).format("M/D/YYYY");
@@ -233,8 +234,10 @@ const handleSubmit = () => {
         drawerProps.value.row.printSecQty = Number(drawerProps.value.row.printSecQty);
         drawerProps.value.row.qrBatchQty = drawerProps.value.row.printSecQty;
         drawerProps.value.row.qrBatchNo = null;
+        drawerProps.value.row.printedQty = drawerProps.value.row.printSecQty + drawerProps.value.row.printedQty;
         // delete drawerProps.value.row.printSecQty;
       }
+      console.log(drawerProps.value.row, "drawerProps.value.row");
       let res: any = await drawerProps.value.api!(drawerProps.value.row);
       console.log(res);
       if (res.code === "200") {
