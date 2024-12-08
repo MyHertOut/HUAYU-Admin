@@ -129,6 +129,7 @@ const columns = reactive<ColumnProps<Depot.ResDepotList>[]>([
   { prop: "shift", label: "班次" },
   { prop: "checker", label: "检验员" },
   { prop: "checkDate", label: "检验日期", width: 100 },
+  { prop: "traceCode", label: "追溯码", width: 180 },
   {
     prop: "depotOwner",
     label: "仓库负责人",

@@ -33,12 +33,21 @@
             </div>
           </div>
           <template #reference>
-            <el-button type="primary" v-if="!scope.row.qrBatchQty" link :icon="Printer" @click="scope.row.visible = true">
+            <el-button
+              type="primary"
+              v-if="!scope.row.isPrintSec && scope.row.traceCodeOpen"
+              link
+              :icon="Printer"
+              @click="isCanPrint(scope.row)"
+            >
+              {{ scope.row.qrBatchQty ? "继续打印" : "打印" }}
+            </el-button>
+            <el-button type="primary" v-if="!scope.row.qrBatchQty" link :icon="Printer" @click="isCanPrint(scope.row)">
               打印
             </el-button>
           </template>
         </el-popover>
-        <el-button type="primary" link :icon="EditPen" @click="openDrawer('复制', scope.row)">复制</el-button>
+        <el-button type="primary" link :icon="CopyDocument" @click="openDrawer('复制', scope.row)">复制</el-button>
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
 
         <el-popover :visible="scope.row.downloadVisible" placement="top" :width="225">
@@ -65,9 +74,10 @@
         <el-button v-if="isAdmin" type="primary" link :icon="Delete" @click="deleteFun(scope.row)">删除</el-button>
       </template>
     </ProTable>
-    <Drawer ref="drawerRef" />
+    <Drawer ref="drawerRef" @print-sec-qty-fun="printSecQtyFun" />
     <ImportExcel ref="dialogRef" />
     <canvas v-show="false" ref="qrCanvas"></canvas>
+    <canvas v-show="false" ref="qrCanvas2"></canvas>
   </div>
 </template>
 
@@ -81,7 +91,7 @@ import ProTable from "@/components/ProTable/index.vue";
 import ImportExcel from "@/components/ImportExcel/index.vue";
 import Drawer from "./components/Drawer.vue";
 import { ProTableInstance, ColumnProps } from "@/components/ProTable/interface";
-import { CirclePlus, Delete, EditPen, View, Printer, Upload, Download } from "@element-plus/icons-vue";
+import { CirclePlus, Delete, View, Printer, Upload, Download, CopyDocument } from "@element-plus/icons-vue";
 import { getUserList } from "@/api/modules/user";
 import {
   getProjectList,
@@ -90,7 +100,8 @@ import {
   delProject,
   exportExcelTemplate,
   exportExcel,
-  importExcel
+  importExcel,
+  checkAllPrintedInDepot
 } from "@/api/modules/project";
 import { findMaterialDictionaryList } from "@/api/modules/materialDic";
 import moment from "moment";
@@ -127,16 +138,40 @@ const dataCallback = (data: any) => {
   // data = {
   //   items: [
   //     {
-  //       partNo: "test",
+  //       id: 1,
+  //       partNo: "11747025",
   //       materialName: "PHEV-1.4T热端后催进气隔热罩左半壳组件",
   //       materialProject: "test",
   //       produceDate: "08/04/2024",
   //       batchNo: "test",
   //       materialNum: 50,
-  //       shift: "test",
+  //       shift: "A",
   //       checker: "test",
   //       qrBatchQty: null,
-  //       checkDate: "08/04/2024"
+  //       checkDate: "08/04/2024",
+  //       traceCodeOpen: true,
+  //       productionLine: "C",
+  //       manufacturerCode: "404082460",
+  //       createTime: "2024-12-03T09:40:11.000+0000",
+  //       isPrintSec: false
+  //     },
+  //     {
+  //       id: 1,
+  //       partNo: "11747025",
+  //       materialName: "PHEV-1.4T热端后催进气隔热罩左半壳组件",
+  //       materialProject: "test",
+  //       produceDate: "08/04/2024",
+  //       batchNo: "test",
+  //       materialNum: 50,
+  //       shift: "A",
+  //       checker: "test",
+  //       qrBatchQty: null,
+  //       checkDate: "08/04/2024",
+  //       traceCodeOpen: true,
+  //       productionLine: "C",
+  //       manufacturerCode: "404082460",
+  //       createTime: "2024-12-03T09:40:11.000+0000",
+  //       isPrintSec: false
   //     }
   //   ],
   //   totalRows: 1,
@@ -218,6 +253,8 @@ const columns = reactive<ColumnProps<Project.ResProjectList>[]>([
   { prop: "qrBatchQty", label: "打印数量", width: 100 },
   { prop: "checkDate", label: "检验日期", width: 100 },
   { prop: "remark", label: "备注", width: 100 },
+  { prop: "productionLine", label: "生产线", width: 100 },
+  { prop: "manufacturerCode", label: "厂商编码", width: 100 },
   { prop: "createTime", label: "创建时间", width: 180 },
   { prop: "updateTime", label: "更新时间", width: 180 },
   {
@@ -272,14 +309,16 @@ const batchAdd = () => {
 
 // 打开 drawer(新增、查看、编辑)
 const drawerRef = ref<InstanceType<typeof Drawer> | null>(null);
-const openDrawer = (title: string, row: Partial<Project.ResProjectList> = {}) => {
+const openDrawer = (title: string, row: Partial<Project.ResProjectList> = {}, isPrintSec?: boolean) => {
+  console.log(title);
   const params = {
     title,
     isView: title === "查看",
     materialDicList: materialDicList.value,
     row: { ...row },
-    api: title === "新增" || title === "复制" ? addProject : title === "编辑" ? editProject : undefined,
-    getTableList: proTable.value?.getTableList
+    api: title === "新增" || title === "复制" || title === "继续打印" ? addProject : title === "编辑" ? editProject : undefined,
+    getTableList: proTable.value?.getTableList,
+    isPrintSec: isPrintSec
   };
   drawerRef.value?.acceptParams(params);
 };
@@ -297,10 +336,76 @@ const base64ToUint8Array = (base64: string): Uint8Array => {
 let printLoading: any = ref(false);
 let printNum: any = ref();
 let printDate: any = ref();
+let canPrint: any = ref(false);
+let latestInDepotRecord: any = ref({});
+let printPreQty: any = ref(0);
+
+const dealNaturalDay = (naturalDay: string, productionLine: string, shift: string) => {
+  // 从naturalDay中移除productionLine和shift，得到实际日期字符串
+  const realDate = naturalDay.replace(productionLine + shift, "").slice(0, 5);
+  // 获取当前日期，格式化为YYYYMMDD
+  // 获取当前日期
+  const now: any = new Date();
+  // 获取年份后两位
+  const year = now.getFullYear().toString().slice(-2);
+  // 获取一年中的第几天 (1-366)
+  const dayOfYear: number = Math.ceil((now.getTime() - new Date(now.getFullYear(), 0, 1).getTime()) / 86400000);
+  const dayStr = dayOfYear.toString().padStart(3, "0");
+  const currentDate = year + dayStr;
+  // 比较是否是当天
+  return realDate === currentDate;
+};
+
+const getPrintPreQty = (traceCode: string, productionLine: string, shift: string) => {
+  return Number(traceCode.replace(productionLine + shift, "").slice(5, 9));
+};
+
+const isCanPrint = async (row: any) => {
+  if (!row.qrBatchQty) {
+    row.visible = true;
+  } else {
+    let res: any = await checkAllPrintedInDepot({ id: row.id });
+    if (res.code === "200") {
+      canPrint.value = res.data.isAllPrintedInDepot;
+      latestInDepotRecord.value = res.data.latestInDepotRecord;
+    }
+    if (!canPrint.value) {
+      ElMessage.error("上一批生产任务还未全部入库！");
+      return;
+    } else {
+      // printSecQtyFun(row);
+      // return;
+      openDrawer("继续打印", row, true);
+    }
+  }
+};
+
+const printSecQtyFun = (row: any) => {
+  let isNaturalDay = dealNaturalDay(
+    latestInDepotRecord.value.traceCode.split("_")[3],
+    latestInDepotRecord.value.productionLine,
+    latestInDepotRecord.value.shift
+  );
+  console.log(isNaturalDay, "isNaturalDay");
+  if (isNaturalDay) {
+    printPreQty.value = getPrintPreQty(
+      latestInDepotRecord.value.traceCode.split("_")[3],
+      latestInDepotRecord.value.productionLine,
+      latestInDepotRecord.value.shift
+    );
+    console.log(printPreQty.value, "printPreQty");
+  } else {
+    printPreQty.value = 0;
+  }
+  let date = moment(new Date(row.createTime)).format("YYYYMMDDHHmmss");
+  printFun(row, date, printPreQty.value);
+};
+
 const printPreFun = async (row: any) => {
   if (!printNum.value) {
     return;
   }
+
   row.visible = false;
   printLoading.value = true;
   row.qrBatchQty = printNum.value;
@@ -314,7 +419,6 @@ const printPreFun = async (row: any) => {
 };
 
 const downloadACopy = (row: any) => {
-  console.log(row, printDate);
   printLoading.value = true;
   ElNotification({
     title: "温馨提示",
@@ -327,35 +431,39 @@ const downloadACopy = (row: any) => {
   printDate.value = "";
 };
 
+const generatePackageCode = (row: any, index: number) => {
+  // 获取当前日期
+  const now: any = new Date();
+
+  // 获取年份后两位
+  const year = now.getFullYear().toString().slice(-2);
+
+  // 获取一年中的第几天 (1-366)
+  const dayOfYear: number = Math.ceil((now.getTime() - new Date(now.getFullYear(), 0, 1).getTime()) / 86400000);
+  const dayStr = dayOfYear.toString().padStart(3, "0");
+
+  // 假设这些数据从props或其他地方获取
+  const productionLine = row.productionLine; // 生产线代码
+  const teamCode = row.shift; // 班组代码 (A或B)
+  const boxNumber = index.toString().padStart(4, "0"); // 包装箱序号，需要根据实际情况生成
+  const defaultValue = "0"; // 默认值
+  const partNumber = row.partNo; // 零件号，需要从实际数据中获取
+
+  // 组合编码
+  const res = `${productionLine}${teamCode}${year}${dayStr}${boxNumber}${defaultValue}${partNumber}`;
+
+  return res;
+};
+
 // 打印
 const qrCanvas: any = ref(null);
+const qrCanvas2: any = ref(null);
 let base64Image: any = ref(null);
-const printFun = async (row: any, date?: string) => {
+let huiSuBase64Image: any = ref(null);
+const printFun = async (row: any, date?: string, printPreQty?: number) => {
   // 创建一个新的工作簿
   const workbook: any = new ExcelJS.Workbook();
   const worksheet: any = workbook.addWorksheet("Material Label");
-
-  // worksheet.pageSetup.margins = {
-  //   left: 0.5,
-  //   right: 0.5,
-  //   top: 0.5,
-  //   bottom: 0.5,
-  //   header: 0.5,
-  //   footer: 0.5
-  // };
-  // worksheet.pageSetup.horizontalCentered = true;
-  // worksheet.pageSetup.verticalCentered = true;
-
-  // // 设置纸张大小为 10cm * 10cm（约等于 3.94 英寸）
-  // worksheet.pageSetup.paperSize = 9; // ExcelJS 预定义纸张大小编号
-  // worksheet.pageSetup.fitToPage = true;
-
-  // // 自定义纸张大小（英寸为单位）
-  // worksheet.pageSetup.pageWidth = 3.94;
-  // worksheet.pageSetup.pageHeight = 3.94;
-
-  // // 设置缩放比例为 55%
-  // worksheet.pageSetup.scale = 55;
 
   const globalFontStyle = { bold: true, color: { argb: "000000" }, name: "Arial", family: 2, size: 20 };
 
@@ -366,30 +474,58 @@ const printFun = async (row: any, date?: string) => {
     right: { style: "medium" }
   };
   let printDate = date;
+  let printQty = 0;
+  if (printPreQty) {
+    printQty = printPreQty;
+  }
   for (let i = 0; i < row.qrBatchQty; i++) {
+    let keyIndex;
+    if (row.traceCodeOpen) {
+      keyIndex = 9;
+    } else {
+      keyIndex = 8;
+    }
+
     // 设置列宽和行高
     worksheet.getColumn(1).width = 18.69;
     worksheet.getColumn(2).width = 28;
     worksheet.getColumn(3).width = 28;
     worksheet.getColumn(4).width = 28;
-    worksheet.getRow(8 * i + 1).height = 140;
-    worksheet.getRow(8 * i + 2).height = 80;
-    worksheet.getRow(8 * i + 3).height = 80;
-    worksheet.getRow(8 * i + 4).height = 80;
-    worksheet.getRow(8 * i + 5).height = 80;
-    worksheet.getRow(8 * i + 6).height = 80;
-    worksheet.getRow(8 * i + 7).height = 40;
+    worksheet.getRow(keyIndex * i + 1).height = 140;
+    worksheet.getRow(keyIndex * i + 2).height = 80;
+    worksheet.getRow(keyIndex * i + 3).height = 80;
+    worksheet.getRow(keyIndex * i + 4).height = 80;
+    worksheet.getRow(keyIndex * i + 5).height = 80;
+    worksheet.getRow(keyIndex * i + 6).height = 80;
+    worksheet.getRow(keyIndex * i + 7).height = 40;
 
-    worksheet.getRow(8 * i + 1).font = globalFontStyle;
-    worksheet.getRow(8 * i + 2).font = globalFontStyle;
-    worksheet.getRow(8 * i + 3).font = globalFontStyle;
-    worksheet.getRow(8 * i + 4).font = globalFontStyle;
-    worksheet.getRow(8 * i + 5).font = globalFontStyle;
-    worksheet.getRow(8 * i + 6).font = globalFontStyle;
-    worksheet.getRow(8 * i + 7).font = globalFontStyle;
+    if (row.traceCodeOpen) {
+      worksheet.getRow(keyIndex * i + 8).height = 580;
+    }
 
-    let printNo = `${printDate}-${i + 1}`;
+    worksheet.getRow(keyIndex * i + 1).font = globalFontStyle;
+    worksheet.getRow(keyIndex * i + 2).font = globalFontStyle;
+    worksheet.getRow(keyIndex * i + 3).font = globalFontStyle;
+    worksheet.getRow(keyIndex * i + 4).font = globalFontStyle;
+    worksheet.getRow(keyIndex * i + 5).font = globalFontStyle;
+    worksheet.getRow(keyIndex * i + 6).font = globalFontStyle;
+    worksheet.getRow(keyIndex * i + 7).font = globalFontStyle;
+
+    if (row.traceCodeOpen) {
+      worksheet.getRow(keyIndex * i + 8).font = globalFontStyle;
+    }
+    console.log(printQty, "printQty", i, i + 1 + printQty, `${i + 1 + printQty}`);
+    let printNo = `${printDate}-${i + 1 + printQty}`;
     let QRCodeUrl = `${row.id}|${printNo}`;
+    let QRCodeUrlHuiSu = "";
+    if (row.traceCodeOpen) {
+      // 将 materialNum 格式化为6位字符串，不足前面补0
+      const formattedNum = row.materialNum.toString().padStart(6, "0");
+      const packageCode = generatePackageCode(row, i + 1 + printQty);
+      QRCodeUrlHuiSu = `${row.partNo}_${row.manufacturerCode ? row.manufacturerCode : "404082460"}_${formattedNum}_${packageCode}`;
+      console.log(QRCodeUrlHuiSu, "QRCodeUrlHuiSu");
+      QRCodeUrl = QRCodeUrl + "|" + QRCodeUrlHuiSu;
+    }
     let base64ImageLogo = base64Logo;
     base64ImageLogo = base64ImageLogo.replace("data:image/png;base64,", "");
     const imageArrayBufferLogo = base64ToUint8Array(base64ImageLogo);
@@ -401,8 +537,8 @@ const printFun = async (row: any, date?: string) => {
     let offsetX = (18.69 * 7.5 - 120) / 2;
     let offsetY = (140 * 0.75 - 120) / 2;
     worksheet.addImage(imageIdLogo, {
-      tl: { col: 0, row: 8 * i, offsetX: offsetX, offsetY: offsetY }, // top-left position of the image
-      br: { col: 1, row: 8 * i + 1, offsetX: -offsetX, offsetY: -offsetY }, // 图片的右下角位置，相对于起始位置的偏移
+      tl: { col: 0, row: keyIndex * i, offsetX: offsetX, offsetY: offsetY }, // top-left position of the image
+      br: { col: 1, row: keyIndex * i + 1, offsetX: -offsetX, offsetY: -offsetY }, // 图片的右下角位置，相对于起始位置的偏移
       ext: { width: 120, height: 120 }, // size of the image
       editAs: "oneCell"
       // offsets: {
@@ -410,10 +546,10 @@ const printFun = async (row: any, date?: string) => {
       //   y: (140 * 0.75 - 100) / 2 // 图片垂直偏移
       // }
     });
-    worksheet.getCell(`A${8 * i + 1}`).alignment = { vertical: "middle", horizontal: "center" };
-    worksheet.getCell(`A${8 * i + 1}`).border = borderStyle;
+    worksheet.getCell(`A${keyIndex * i + 1}`).alignment = { vertical: "middle", horizontal: "center" };
+    worksheet.getCell(`A${keyIndex * i + 1}`).border = borderStyle;
 
-    let startRow = 8 * i + 1;
+    let startRow = keyIndex * i + 1;
     let startCol = 2;
     // let numRows = 3;
     let numCols = 1;
@@ -448,13 +584,14 @@ const printFun = async (row: any, date?: string) => {
       extension: "png"
     });
     worksheet.addImage(imageId, {
-      tl: { col: 3, row: 8 * i }, // top-left position of the image
-      br: { col: 4, row: 8 * i + 1 }, // 图片的右下角位置，相对于起始位置的偏移
+      tl: { col: 3, row: keyIndex * i }, // top-left position of the image
+      br: { col: 4, row: keyIndex * i + 1 }, // 图片的右下角位置，相对于起始位置的偏移
       extension: { width: 120, height: 120 }, // size of the image
       editAs: "oneCell"
     });
-    worksheet.getCell(`D${8 * i + 1}`).alignment = { vertical: "middle", horizontal: "center" };
-    worksheet.getCell(`D${8 * i + 1}`).border = borderStyle;
+
+    worksheet.getCell(`D${keyIndex * i + 1}`).alignment = { vertical: "middle", horizontal: "center" };
+    worksheet.getCell(`D${keyIndex * i + 1}`).border = borderStyle;
 
     worksheet.getCell(`${startRow + 1}`, 1).value = "项目名称\nProject";
     worksheet.getCell(`${startRow + 1}`, 1).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
@@ -462,13 +599,6 @@ const printFun = async (row: any, date?: string) => {
     worksheet.getCell(`${startRow + 1}`, 2).value = row.materialProject;
     worksheet.getCell(`${startRow + 1}`, 2).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
     worksheet.getCell(`${startRow + 1}`, 2).border = borderStyle;
-
-    // worksheet.getCell(`${startRow + 1}`, 3).value = "零件名称\nDescription";
-    // worksheet.getCell(`${startRow + 1}`, 3).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
-    // worksheet.getCell(`${startRow + 1}`, 3).border = borderStyle;
-    // worksheet.getCell(`${startRow + 1}`, 4).value = row.materialName;
-    // worksheet.getCell(`${startRow + 1}`, 4).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
-    // worksheet.getCell(`${startRow + 1}`, 4).border = borderStyle;
 
     let materialNameRange =
       worksheet.getCell(`${startRow + 1}`, 3).address + ":" + worksheet.getCell(`${startRow + 2}`, 3).address;
@@ -528,18 +658,6 @@ const printFun = async (row: any, date?: string) => {
     worksheet.getCell(`${startRow + 5}`, 4).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
     worksheet.getCell(`${startRow + 5}`, 4).border = borderStyle;
 
-    // let insDateRange = worksheet.getCell(`${startRow + 4}`, 3).address + ":" + worksheet.getCell(`${startRow + 5}`, 3).address;
-    // worksheet.mergeCells(insDateRange);
-    // worksheet.getCell(insDateRange).value = "检验日期\nInspection Date";
-    // worksheet.getCell(insDateRange).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
-    // worksheet.getCell(insDateRange).border = borderStyle;
-
-    // let insDateValRange = worksheet.getCell(`${startRow + 4}`, 4).address + ":" + worksheet.getCell(`${startRow + 5}`, 4).address;
-    // worksheet.mergeCells(insDateValRange);
-    // worksheet.getCell(insDateValRange).value = row.checkDate;
-    // worksheet.getCell(insDateValRange).alignment = { vertical: "middle", horizontal: "center", wrapText: true };
-    // worksheet.getCell(insDateValRange).border = borderStyle;
-
     worksheet.getCell(`${startRow + 5}`, 1).value = "检验员\nInspector";
     worksheet.getCell(`${startRow + 5}`, 1).alignment = { wrapText: true, vertical: "middle", horizontal: "center" };
     worksheet.getCell(`${startRow + 5}`, 1).border = borderStyle;
@@ -549,12 +667,48 @@ const printFun = async (row: any, date?: string) => {
 
     let endDateNoRange = worksheet.getCell(`${startRow + 6}`, 1).address + ":" + worksheet.getCell(`${startRow + 6}`, 4).address;
     worksheet.mergeCells(endDateNoRange);
-    worksheet.getCell(endDateNoRange).value = `${printDate}-${i + 1}`;
+    worksheet.getCell(endDateNoRange).value = `${printDate}-${i + 1 + printQty}`;
     worksheet.getCell(endDateNoRange).alignment = { vertical: "middle", horizontal: "center" };
     worksheet.getCell(endDateNoRange).border = borderStyle;
 
-    let endMergeRange = worksheet.getCell(`${startRow + 7}`, 1).address + ":" + worksheet.getCell(`${startRow + 7}`, 4).address;
-    worksheet.mergeCells(endMergeRange);
+    if (row.traceCodeOpen) {
+      huiSuBase64Image.value = await generateHuiSuQRCode(QRCodeUrlHuiSu);
+      if (!huiSuBase64Image.value) {
+        return;
+      }
+      huiSuBase64Image.value = huiSuBase64Image.value.replace("data:image/png;base64,", "");
+      const imageArrayBufferHuiSu = base64ToUint8Array(huiSuBase64Image.value);
+      const imageIdHuiSu = workbook.addImage({
+        buffer: imageArrayBufferHuiSu,
+        extension: "png"
+      });
+
+      // let huiSuMergeRange =
+      //   worksheet.getCell(`${startRow + 7}`, 1).address + ":" + worksheet.getCell(`${startRow + 7}`, 4).address;
+      // worksheet.mergeCells(huiSuMergeRange);
+      // worksheet.getCell(huiSuMergeRange).border = borderStyle;
+
+      // 计算单元格的实际宽度和高度
+      const cellWidth = 18.69 * 4 * 7.5; // 4个合并单元格的总宽度
+      const cellHeight = 580 * 0.75; // 单元格高度
+
+      // 计算居中偏移量
+      const offsetX = (cellWidth - 400) / 2; // 单元格宽度减去图片宽度除以2
+      const offsetY = (cellHeight - 120) / 2; // 单元格高度减去图片高度除以2
+
+      worksheet.addImage(imageIdHuiSu, {
+        tl: { col: 0, row: keyIndex * i + 7, offsetX, offsetY },
+        br: { col: 4, row: keyIndex * i + 8, offsetX: -offsetX, offsetY: -offsetY },
+        extension: { width: 400, height: 120 },
+        editAs: "oneCell"
+      });
+
+      let endMergeRange = worksheet.getCell(`${startRow + 8}`, 1).address + ":" + worksheet.getCell(`${startRow + 8}`, 4).address;
+      worksheet.mergeCells(endMergeRange);
+    } else {
+      let endMergeRange = worksheet.getCell(`${startRow + 7}`, 1).address + ":" + worksheet.getCell(`${startRow + 7}`, 4).address;
+      worksheet.mergeCells(endMergeRange);
+    }
   }
 
   // 导出 Excel 文件
@@ -595,6 +749,104 @@ const generateQRCodeWithBorder = async (text: any) => {
           ctx.drawImage(qrImage, 20, 20, 164, 164);
           resolve(canvas.toDataURL("image/png"));
         };
+      } catch (err) {
+        console.error(err);
+      }
+    }, 0)
+  );
+};
+
+const generateHuiSuQRCode = async (text: any) => {
+  return new Promise(resolve =>
+    setTimeout(async () => {
+      try {
+        // 1. 提高DPI和画布尺寸
+        const DPI = 7.56; // 将DPI提高一倍 (原来是3.78)
+        const CANVAS_WIDTH = Math.round(120 * DPI);
+        const CANVAS_HEIGHT = Math.round(120 * DPI);
+        const QR_SIZE = Math.round(30 * DPI);
+
+        // 2. 提高二维码生成质量
+        const qrDataUrl = await QRCode.toDataURL(text, {
+          errorCorrectionLevel: "H",
+          width: QR_SIZE,
+          margin: 0,
+          quality: 1.0, // 最高质量
+          scale: 4 // 增加二维码的缩放比例
+        });
+
+        const canvas = qrCanvas.value;
+        const ctx = canvas.getContext("2d", {
+          // 3. 添加canvas上下文配置
+          alpha: false,
+          antialias: true,
+          willReadFrequently: true
+        });
+
+        // 4. 启用图像平滑
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+
+        // 设置画布尺寸
+        canvas.width = CANVAS_WIDTH;
+        canvas.height = CANVAS_HEIGHT;
+
+        // 5. 使用更高的缩放比进行绘制
+        ctx.scale(1, 1);
+
+        // 清空画布
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 绘制边框
+        // ctx.strokeStyle = "black";
+        // ctx.lineWidth = 2; // 增加边框宽度
+        // ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+        // 加载并绘制二维码
+        const qrImage = new Image();
+        qrImage.src = qrDataUrl;
+        await new Promise(resolve => {
+          qrImage.onload = resolve;
+        });
+
+        // 6. 使用更精确的定位计算
+        const qrY = Math.round((CANVAS_HEIGHT - QR_SIZE) / 2);
+        ctx.drawImage(qrImage, 175, qrY, QR_SIZE, QR_SIZE);
+
+        // 7. 优化文字渲染
+        const fontSize = Math.round(4 * DPI);
+        ctx.textRendering = "geometricPrecision";
+        ctx.fontKerning = "normal";
+        ctx.font = `bold ${fontSize}px "Arial Narrow"`;
+        ctx.fillStyle = "black";
+        ctx.textAlign = "left";
+
+        const [num1, num2, num3, num4] = text.split("_");
+        const textX = QR_SIZE + 225;
+        const baseSize = Math.round(4 * DPI);
+        const largeSize = Math.round(8 * DPI);
+        const lineHeight = largeSize * 1.2;
+        const textStartY = qrY + (QR_SIZE - lineHeight * 3) / 2 - 10;
+
+        // 8. 使用更精确的文本绘制
+        const firstFour = num1.slice(0, 4);
+        const lastFour = num1.slice(4);
+
+        ctx.font = `bold ${baseSize}px "Arial Narrow"`;
+        ctx.fillText(firstFour, textX, textStartY + lineHeight);
+
+        const firstFourWidth = ctx.measureText(firstFour).width;
+
+        ctx.font = `bold ${largeSize}px "Arial Narrow"`;
+        ctx.fillText(lastFour, textX + firstFourWidth, textStartY + lineHeight);
+
+        ctx.font = `bold ${baseSize}px "Arial Narrow"`;
+        ctx.fillText(`${num2}        ${num3}`, textX, textStartY + lineHeight * 2);
+        ctx.fillText(num4, textX, textStartY + lineHeight * 3);
+
+        // 9. 使用更高质量的图片导出
+        resolve(canvas.toDataURL("image/png", 1.0));
       } catch (err) {
         console.error(err);
       }

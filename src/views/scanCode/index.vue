@@ -38,12 +38,12 @@
           </el-select>
         </el-form-item>
         <!-- v-if="!isDepotLocationIdHave" -->
-        <el-form-item label="备注" prop="depotLocationDesc">
+        <el-form-item :label="params.operateType === 1 ? '入库备注' : '出库备注'" prop="depotLocationDesc">
           <el-input v-model="params.depotLocationDesc" placeholder="请输入备注" clearable></el-input>
         </el-form-item>
       </div>
       <div style="padding: 10px; background: #efefef" v-if="params.operateType === 2">
-        <el-form-item label="备注" prop="depotLocationDesc">
+        <el-form-item label="出库备注" prop="depotLocationDesc">
           <el-input v-model="params.depotLocationDesc" placeholder="请输入备注" clearable></el-input>
         </el-form-item>
       </div>
@@ -159,6 +159,9 @@ const startScan = async () => {
           // result.value = "25|20240801130894-10";
           params.value.materialId = result.value.split("|")[0];
           params.value.qrSerialNo = result.value.split("|")[1];
+          if (result.value.split("|").length > 2) {
+            params.value.traceCode = result.value.split("|")[2];
+          }
           if (!isUploading.value) {
             isUploading.value = true;
             let data = {};
@@ -171,7 +174,8 @@ const startScan = async () => {
                   depotLocationNo: params.value.depotLocationId,
                   materialId: params.value.materialId,
                   operateType: params.value.operateType,
-                  qrSerialNo: params.value.qrSerialNo
+                  qrSerialNo: params.value.qrSerialNo,
+                  traceCode: params.value.traceCode || ""
                 };
               } else {
                 data = {
@@ -180,7 +184,8 @@ const startScan = async () => {
                   depotLocationId: params.value.depotLocationId,
                   materialId: params.value.materialId,
                   operateType: params.value.operateType,
-                  qrSerialNo: params.value.qrSerialNo
+                  qrSerialNo: params.value.qrSerialNo,
+                  traceCode: params.value.traceCode || ""
                 };
               }
             } else {
@@ -188,7 +193,8 @@ const startScan = async () => {
                 depotLocationDesc: params.value.depotLocationDesc,
                 materialId: params.value.materialId,
                 operateType: params.value.operateType,
-                qrSerialNo: params.value.qrSerialNo
+                qrSerialNo: params.value.qrSerialNo,
+                traceCode: params.value.traceCode || ""
               };
             }
             addDepotRecord(data)

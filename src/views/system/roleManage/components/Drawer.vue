@@ -22,6 +22,7 @@
         <el-radio-group v-model="drawerProps.row!.roleType">
           <el-radio :value="1" size="large">普通角色</el-radio>
           <el-radio :value="2" size="large">超级角色</el-radio>
+          <el-radio :value="3" size="large">班组角色</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="菜单权限" prop="menuIds">
@@ -107,3 +108,9 @@ defineExpose({
   acceptParams
 });
 </script>
+
+<style>
+.el-form-item {
+  align-items: center;
+}
+</style>

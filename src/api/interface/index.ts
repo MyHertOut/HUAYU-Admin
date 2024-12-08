@@ -93,7 +93,9 @@ export namespace User {
 
 // 产品管理模块
 export namespace Project {
-  export interface ReqProjectParams extends ReqPage {}
+  export interface ReqProjectParams extends ReqPage {
+    isPrintSec: boolean;
+  }
   export interface ResProjectList {
     id: number;
     materialProject: string; // 项目名册
@@ -117,6 +119,11 @@ export namespace Project {
     qrBatchNo: any;
     materialBelongTo: string;
     creatorId: number;
+    traceCodeOpen: any;
+    productionLine: any;
+    manufacturerCode: any;
+    printSecQty: number;
+    isPrintSec: boolean;
   }
 }
 

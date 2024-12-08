@@ -33,3 +33,11 @@ export const exportExcel = params => {
 export const importExcel = (params: FormData) => {
   return http.post(PORT4 + `/material/importExcel`, params);
 };
+
+export const checkAllPrintedInDepot = (params: { id: number }) => {
+  return http.get(PORT4 + `/material/checkAllPrintedInDepot?materialId=${params.id}`);
+};
+
+export const updateMaterial = (params: any) => {
+  return http.put(PORT4 + `/material/updateMaterial`, params);
+};

@@ -121,6 +121,7 @@ const columns = reactive<ColumnProps<any>[]>([
   },
   { prop: "operatorName", label: "出库人", width: 180 },
   { prop: "sourceLocationDescribe", label: "备注", width: 180 },
+  { prop: "traceCode", label: "追溯码", width: 180 },
   { prop: "operation", label: "操作", fixed: "right", width: 220 }
 ]);
 

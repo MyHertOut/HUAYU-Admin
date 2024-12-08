@@ -157,7 +157,7 @@ const GetRoleList = async () => {
       e.value = JSON.stringify({
         roleId: e.id,
         roleType: e.roleType,
-        roleTypeName: e.roleType === 1 ? "普通角色" : "超级角色",
+        roleTypeName: e.roleType === 1 ? "普通角色" : e.roleType === 2 ? "超级角色" : "班组角色",
         roleName: e.roleName
       });
     });
@@ -205,3 +205,9 @@ const openDrawer = (title: string, row: Partial<User.ResUserList> = {}) => {
   drawerRef.value?.acceptParams(params);
 };
 </script>
+
+<style>
+.el-form-item {
+  align-items: center;
+}
+</style>

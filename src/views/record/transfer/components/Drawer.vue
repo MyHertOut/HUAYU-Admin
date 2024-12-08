@@ -39,6 +39,9 @@
         <el-form-item label="检验日期" prop="checkDate">
           <el-input v-model="drawerProps.row!.checkDate" clearable></el-input>
         </el-form-item>
+        <el-form-item label="追溯码" prop="traceCode">
+          <el-input v-model="drawerProps.row!.traceCode" clearable></el-input>
+        </el-form-item>
       </div>
 
       <div style="padding: 10px; margin-bottom: 10px; border: 1px solid #efefef">
