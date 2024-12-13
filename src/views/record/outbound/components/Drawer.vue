@@ -52,7 +52,7 @@
         <el-form-item label="库位" prop="sourceLocationNo">
           <el-input v-model="drawerProps.row!.sourceLocationNo" clearable></el-input>
         </el-form-item>
-        <el-form-item label="库位描述" prop="sourceLocationDescribe">
+        <el-form-item label="出库备注" prop="sourceLocationDescribe">
           <el-input v-model="drawerProps.row!.sourceLocationDescribe" clearable></el-input>
         </el-form-item>
       </div>
