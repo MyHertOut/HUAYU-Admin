@@ -83,7 +83,7 @@ const columns = reactive<ColumnProps<Role.ResRoleList>[]>([
     prop: "roleType",
     label: "类型",
     render: scope => {
-      return <>{scope.row.roleType === 1 ? "普通角色" : "超级角色"}</>;
+      return <>{scope.row.roleType === 1 ? "普通角色" : scope.row.roleType === 2 ? "超级角色" : "班组角色"}</>;
     }
   },
   { prop: "createTime", label: "创建时间", width: 180 },
