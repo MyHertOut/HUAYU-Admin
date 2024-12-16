@@ -119,6 +119,10 @@ import { findUserList } from "@/api/modules/user";
 
 const isAdmin: any = ref(false);
 const getAdmin = async () => {
+  console.log(
+    JSON.parse(localStorage["huaYu-user"]).userInfo.username,
+    "JSON.parse(localStorage['huaYu-user']).userInfo.username"
+  );
   let res: any = await getUserList({
     username: JSON.parse(localStorage["huaYu-user"]).userInfo.username
   } as any);
@@ -127,6 +131,7 @@ const getAdmin = async () => {
       isAdmin.value = true;
     }
   }
+  isAdmin.value = false;
 };
 onMounted(() => {
   getAdmin();
