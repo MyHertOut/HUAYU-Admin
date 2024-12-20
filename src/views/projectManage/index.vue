@@ -131,7 +131,7 @@ const getAdmin = async () => {
       isAdmin.value = true;
     }
   }
-  isAdmin.value = false;
+  // isAdmin.value = false;
 };
 onMounted(() => {
   getAdmin();
