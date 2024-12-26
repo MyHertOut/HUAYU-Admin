@@ -90,7 +90,7 @@ const columns = reactive<ColumnProps<any>[]>([
     prop: "partNo",
     label: "件号",
     enum: materialDicList,
-    search: { el: "select", props: { filterable: true, filterMethod: true } },
+    search: { el: "select", props: { filterable: true, filterMethod: true, allowCreate: true } },
     fieldNames: { label: "partNo", value: "partNo" },
     width: 120
   },
