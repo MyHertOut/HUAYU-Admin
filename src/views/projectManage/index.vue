@@ -63,9 +63,19 @@
             <div style="margin-bottom: 5px; font-size: 12px; color: red">
               Tips:【已在库中，但是Excel丢失，请到库存列表中找到对应数据的编号前缀以及Id】【仅针对老数据】
             </div>
-            <el-input v-model="printDate" style="width: 200px" placeholder="请输入编号前缀" />
+            <el-input v-model="printDate" style="width: 200px; margin-bottom: 5px" placeholder="请输入编号前缀" />
+            <el-date-picker
+              v-model="naturalDay"
+              style="width: 200px"
+              type="date"
+              placeholder="指定自然日"
+              :size="'small'"
+              format="YYYY-MM-DD"
+            />
             <div style="margin: 15px 0 0; text-align: right">
-              <el-button size="small" text @click="(scope.row.downloadVisible = false), (printDate = '')">取消</el-button>
+              <el-button size="small" text @click="(scope.row.downloadVisible = false), (printDate = ''), (naturalDay = '')">
+                取消
+              </el-button>
               <el-button size="small" type="primary" @click="downloadACopy(scope.row)"> 确定 </el-button>
             </div>
           </div>
@@ -350,6 +360,7 @@ let printDate: any = ref();
 let canPrint: any = ref(false);
 let latestInDepotRecord: any = ref({});
 let printPreQty: any = ref(0);
+let naturalDay: any = ref("");
 
 const dealNaturalDay = (naturalDay: string, productionLine: string, shift: string) => {
   // 从naturalDay中移除productionLine和shift，得到实际日期字符串
@@ -360,7 +371,10 @@ const dealNaturalDay = (naturalDay: string, productionLine: string, shift: strin
   // 获取年份后两位
   const year = now.getFullYear().toString().slice(-2);
   // 获取一年中的第几天 (1-366)
-  const dayOfYear: number = Math.ceil((now.getTime() - new Date(now.getFullYear(), 0, 1).getTime()) / 86400000);
+  let dayOfYear: number = Math.ceil((now.getTime() - new Date(now.getFullYear(), 0, 1).getTime()) / 86400000);
+  if (now.getDate() < 10) {
+    dayOfYear += 1; // 小于 10 号，加一天
+  }
   const dayStr = dayOfYear.toString().padStart(3, "0");
   const currentDate = year + dayStr;
   // 比较是否是当天
@@ -450,15 +464,19 @@ const downloadACopy = (row: any) => {
 
 const generatePackageCode = (row: any, index: number) => {
   // 获取当前日期
-  const now: any = new Date();
-
+  const now: any = naturalDay.value ? new Date(naturalDay.value) : new Date();
+  console.log(now, "now");
   // 获取年份后两位
   const year = now.getFullYear().toString().slice(-2);
 
   // 获取一年中的第几天 (1-366)
-  const dayOfYear: number = Math.ceil((now.getTime() - new Date(now.getFullYear(), 0, 1).getTime()) / 86400000);
-  const dayStr = dayOfYear.toString().padStart(3, "0");
-
+  let dayOfYear: number = Math.ceil((now.getTime() - new Date(now.getFullYear(), 0, 1).getTime()) / 86400000);
+  console.log(dayOfYear, "dayOfYear");
+  if (now.getDate() < 10) {
+    dayOfYear += 1; // 小于 10 号，加一天
+  }
+  const dayStr = dayOfYear.toString().padStart(3, "0"); // 自然日
+  console.log(dayStr, "dayStr");
   // 假设这些数据从props或其他地方获取
   const productionLine = row.productionLine; // 生产线代码
   const teamCode = row.shift; // 班组代码 (A或B)
@@ -468,7 +486,7 @@ const generatePackageCode = (row: any, index: number) => {
 
   // 组合编码
   const res = `${productionLine}${teamCode}${year}${dayStr}${boxNumber}${defaultValue}${partNumber}`;
-
+  naturalDay.value = "";
   return res;
 };
 
@@ -531,7 +549,7 @@ const printFun = async (row: any, date?: string, printPreQty?: number) => {
     if (row.traceCodeOpen) {
       worksheet.getRow(keyIndex * i + 8).font = globalFontStyle;
     }
-    console.log(printQty, "printQty", i, i + 1 + printQty, `${i + 1 + printQty}`);
+    console.log(printQty, "printQty", i, i + 1 + printQty, `${i + 1 + printQty}`, row.traceCodeOpen);
     let printNo = `${printDate}-${i + 1 + printQty}`;
     let QRCodeUrl = `${row.id}|${printNo}`;
     let QRCodeUrlHuiSu = "";
@@ -539,6 +557,7 @@ const printFun = async (row: any, date?: string, printPreQty?: number) => {
       // 将 materialNum 格式化为6位字符串，不足前面补0
       const formattedNum = row.materialNum.toString().padStart(6, "0");
       const packageCode = generatePackageCode(row, i + 1 + printQty);
+      console.log(packageCode, "packageCode");
       QRCodeUrlHuiSu = `${row.partNo}_${row.manufacturerCode ? row.manufacturerCode : "404082460"}_${formattedNum}_${packageCode}`;
       console.log(QRCodeUrlHuiSu, "QRCodeUrlHuiSu");
       QRCodeUrl = QRCodeUrl + "|" + QRCodeUrlHuiSu;
