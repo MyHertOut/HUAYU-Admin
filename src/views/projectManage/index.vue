@@ -71,6 +71,7 @@
               placeholder="指定自然日"
               :size="'small'"
               format="YYYY-MM-DD"
+              v-if="false"
             />
             <div style="margin: 15px 0 0; text-align: right">
               <el-button size="small" text @click="(scope.row.downloadVisible = false), (printDate = ''), (naturalDay = '')">
