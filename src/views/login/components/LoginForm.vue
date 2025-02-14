@@ -97,8 +97,19 @@ const login = (formEl: FormInstance | undefined) => {
             router.push(firstPath);
           }
         } else {
-          let firstPath = authMenuListGet[0].path;
-          router.push(firstPath);
+          let firstRoute = authMenuListGet[0];
+          if (firstRoute.redirect) {
+            if (firstRoute.children?.findIndex((e: any) => e.path === firstRoute.redirect) !== -1) {
+              console.log(1);
+              router.push(firstRoute.path);
+            } else {
+              console.log(2, firstRoute.children[0].path);
+              router.push(firstRoute.children[0].path);
+            }
+          } else {
+            console.log(3);
+            router.push(firstRoute.path);
+          }
         }
       });
       ElNotification({
