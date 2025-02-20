@@ -216,8 +216,8 @@ const dataCallback = (data: any) => {
 // 默认不做操作就直接在 ProTable 组件上绑定	:requestApi="getProjectList"
 const getTableList = (params: any) => {
   let newParams = JSON.parse(JSON.stringify(params));
-  newParams.createTime && (newParams.startDate = newParams.createTime[0]);
-  newParams.createTime && (newParams.endDate = newParams.createTime[1]);
+  newParams.createTime && (newParams.createStartDate = newParams.createTime[0]);
+  newParams.createTime && (newParams.createEndDate = newParams.createTime[1]);
   delete newParams.createTime;
   return getProjectList(newParams);
 };
@@ -277,13 +277,27 @@ const columns = reactive<ColumnProps<Project.ResProjectList>[]>([
   { prop: "remark", label: "标识卡备注", width: 100 },
   { prop: "productionLine", label: "生产线", width: 100 },
   { prop: "manufacturerCode", label: "厂商编码", width: 100 },
-  { prop: "createTime", label: "创建时间", width: 180 },
+  {
+    prop: "createTime",
+    label: "创建时间",
+    search: {
+      el: "date-picker",
+      span: 2,
+      props: { type: "daterange", valueFormat: "YYYY-MM-DD" },
+      defaultValue: []
+    },
+    width: 180
+  },
   { prop: "updateTime", label: "更新时间", width: 180 },
   {
     prop: "creatorId",
     label: "创建人",
+    enum: userList,
+    search: { el: "select", props: { filterable: true, filterMethod: false, allowCreate: false } },
+    fieldNames: { label: "username", value: "id" },
+    isFilterEnum: true,
     render: scope => {
-      return <>{dealName(scope.row.creatorId)}</>;
+      return <span>{dealName(scope.row.creatorId)}</span>;
     },
     width: 180
   },

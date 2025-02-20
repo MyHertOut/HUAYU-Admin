@@ -52,6 +52,7 @@ const fieldNames = computed(() => {
 const enumMap = inject("enumMap", ref(new Map()));
 let columnEnum = computed(() => {
   let enumData = enumMap.value.get(props.column.prop);
+  console.log(enumData, props.column.search?.el, props.column.fieldNames);
   if (!enumData) return [];
   if (props.column.search?.el === "select-v2" && props.column.fieldNames) {
     enumData = enumData.map((item: { [key: string]: any }) => {
@@ -99,6 +100,10 @@ const clearable = computed(() => {
 
 let filterList: any = ref([]);
 const filterMethod = (value: any) => {
+  console.log(value, props.column.search?.key, handleProp(props.column.prop!));
+  if (!value) {
+    return;
+  }
   filterList.value = columnEnum.value.filter((e: any) =>
     e[props.column.search?.key ?? handleProp(props.column.prop!)].includes(value)
   );

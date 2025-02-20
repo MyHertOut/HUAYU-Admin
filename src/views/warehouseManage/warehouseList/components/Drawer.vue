@@ -10,12 +10,7 @@
       :hide-required-asterisk="drawerProps.isView"
     >
       <el-form-item label="名称" prop="depotName">
-        <el-input
-          v-model="drawerProps.row!.depotName"
-          placeholder="请输入仓库名称"
-          clearable
-          :disabled="drawerProps.title !== '新增'"
-        ></el-input>
+        <el-input v-model="drawerProps.row!.depotName" placeholder="请输入仓库名称" clearable></el-input>
       </el-form-item>
       <el-form-item label="编号" prop="depotNo">
         <el-input v-model="drawerProps.row!.depotNo" placeholder="请输入仓库编号" clearable></el-input>
@@ -32,7 +27,6 @@
       <el-form-item label="负责人" prop="depotOwner">
         <el-select
           v-model="drawerProps.row!.depotOwner"
-          :disabled="drawerProps.title !== '新增'"
           filterable
           default-first-option
           placeholder="请输入仓库负责人"
