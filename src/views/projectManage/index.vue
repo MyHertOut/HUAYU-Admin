@@ -71,7 +71,6 @@
               placeholder="指定自然日"
               :size="'small'"
               format="YYYY-MM-DD"
-              v-if="false"
             />
             <div style="margin: 15px 0 0; text-align: right">
               <el-button size="small" text @click="(scope.row.downloadVisible = false), (printDate = ''), (naturalDay = '')">
@@ -378,6 +377,7 @@ let printPreQty: any = ref(0);
 let naturalDay: any = ref("");
 
 const dealNaturalDay = (naturalDay: string, productionLine: string, shift: string) => {
+  console.log(naturalDay, "naturalDay");
   // 从naturalDay中移除productionLine和shift，得到实际日期字符串
   const realDate = naturalDay.replace(productionLine + shift, "").slice(0, 5);
   // 获取当前日期，格式化为YYYYMMDD
@@ -386,7 +386,9 @@ const dealNaturalDay = (naturalDay: string, productionLine: string, shift: strin
   // 获取年份后两位
   const year = now.getFullYear().toString().slice(-2);
   // 获取一年中的第几天 (1-366)
-  let dayOfYear: number = Math.ceil((now.getTime() - new Date(now.getFullYear(), 0, 1).getTime()) / 86400000);
+  const startOfYear = new Date(now.getFullYear(), 0, 1); // 当年的1月1日
+  const diffTime = now.getTime() - startOfYear.getTime();
+  let dayOfYear = Math.floor(diffTime / (24 * 60 * 60 * 1000)) + 1; // +1
   if (now.getDate() < 10) {
     dayOfYear += 1; // 小于 10 号，加一天
   }
@@ -485,7 +487,10 @@ const generatePackageCode = (row: any, index: number) => {
   const year = now.getFullYear().toString().slice(-2);
 
   // 获取一年中的第几天 (1-366)
-  let dayOfYear: number = Math.ceil((now.getTime() - new Date(now.getFullYear(), 0, 1).getTime()) / 86400000);
+  // 使用更准确的方法计算一年中的天数
+  const startOfYear = new Date(now.getFullYear(), 0, 1); // 当年的1月1日
+  const diffTime = now.getTime() - startOfYear.getTime();
+  let dayOfYear = Math.floor(diffTime / (24 * 60 * 60 * 1000)) + 1; // +1
   console.log(dayOfYear, "dayOfYear");
   if (now.getDate() < 10) {
     dayOfYear += 1; // 小于 10 号，加一天
