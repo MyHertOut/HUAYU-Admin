@@ -479,9 +479,10 @@ const downloadACopy = (row: any) => {
   printDate.value = "";
 };
 
-const generatePackageCode = (row: any, index: number) => {
+const generatePackageCode = (row: any, index: number, date: any) => {
+  console.log(date);
   // 获取当前日期
-  const now: any = naturalDay.value ? new Date(naturalDay.value) : new Date();
+  const now: any = naturalDay.value ? new Date(naturalDay.value) : moment(date, "YYYYMMDDHHmmss").toDate();
   console.log(now, "now");
   // 获取年份后两位
   const year = now.getFullYear().toString().slice(-2);
@@ -516,6 +517,7 @@ const qrCanvas2: any = ref(null);
 let base64Image: any = ref(null);
 let huiSuBase64Image: any = ref(null);
 const printFun = async (row: any, date?: string, printPreQty?: number) => {
+  console.log(date, "printFun");
   // 创建一个新的工作簿
   const workbook: any = new ExcelJS.Workbook();
   const worksheet: any = workbook.addWorksheet("Material Label");
@@ -576,7 +578,7 @@ const printFun = async (row: any, date?: string, printPreQty?: number) => {
     if (row.traceCodeOpen) {
       // 将 materialNum 格式化为6位字符串，不足前面补0
       const formattedNum = row.materialNum.toString().padStart(6, "0");
-      const packageCode = generatePackageCode(row, i + 1 + printQty);
+      const packageCode = generatePackageCode(row, i + 1 + printQty, printDate);
       console.log(packageCode, "packageCode");
       QRCodeUrlHuiSu = `${row.partNo}_${row.manufacturerCode ? row.manufacturerCode : "404082460"}_${formattedNum}_${packageCode}`;
       console.log(QRCodeUrlHuiSu, "QRCodeUrlHuiSu");
