@@ -325,9 +325,17 @@ const batchDelete = async (ids: string[]) => {
 
 // 导出用户列表
 const downloadFile = async () => {
-  ElMessageBox.confirm("确认导出标识卡数据?", "温馨提示", { type: "warning" }).then(() =>
-    useDownload(exportExcel, "标识卡列表", proTable.value?.searchParam)
-  );
+  ElMessageBox.confirm("确认导出标识卡数据?", "温馨提示", { type: "warning" }).then(() => {
+    let startDate: any = "";
+    let endDate: any = "";
+    startDate = proTable.value?.searchParam.createTime[0];
+    endDate = proTable.value?.searchParam.createTime[1];
+    useDownload(exportExcel, "标识卡列表", {
+      createStartDate: startDate,
+      createEndDate: endDate
+    });
+    // useDownload(exportExcel, "标识卡列表", proTable.value?.searchParam);
+  });
 };
 
 // 批量添加用户
